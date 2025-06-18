@@ -14,14 +14,15 @@ class OnBoardingPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(height: media.width * 0.09),
-          Image.asset(
-            pObj["image"].toString(),
-            width: media.width,
-            fit: BoxFit.fitWidth,
+          // Push image slightly below top (use height instead of width for better vertical control)
+          SizedBox(height: media.height * 0.12),
+          SizedBox(
+            width: media.width * 0.9,
+            height: media.height * 0.45,
+            child: Image.asset(pObj["image"].toString(), fit: BoxFit.cover),
           ),
 
-          SizedBox(height: media.width * 0.01),
+         SizedBox(height: media.width * 0.01),
 
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -35,6 +36,8 @@ class OnBoardingPage extends StatelessWidget {
               ),
             ),
           ),
+
+          SizedBox(height: 6),
 
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15),

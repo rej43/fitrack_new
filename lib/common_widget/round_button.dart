@@ -15,11 +15,11 @@ class RoundButtton extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
       textColor: TColor.primaryColor1,
       minWidth: double.maxFinite,
-      color: TColor.white,
+      color: TColor.grey,
       child: Text(
         title,
         style: TextStyle(
-          color: TColor.primaryColor1,
+          color: TColor.white,
           fontSize: 16,
           fontWeight: FontWeight.w700,
         ),

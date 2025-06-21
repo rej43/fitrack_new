@@ -93,7 +93,13 @@ class _OnBoardingViewState extends State<OnBoardingView> {
 
                         controller.jumpToPage(selectPage);
                         setState(() {});
-                      } else {}
+                      } else {
+                        print("Open Welcome Screen");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => SignUpView()),
+                        );
+                      }
                     },
                   ),
                 ),

@@ -2,6 +2,7 @@ import 'package:fitrack/common_widget/on_boarding_page.dart';
 import 'package:flutter/material.dart';
 // ignore: unused_import
 import '../../common/color_extension.dart';
+import 'package:fitrack/view/login/signupview.dart';
 
 class OnBoardingView extends StatefulWidget {
   const OnBoardingView({super.key});
@@ -45,6 +46,7 @@ class _OnBoardingViewState extends State<OnBoardingView> {
   ];
   @override
   Widget build(BuildContext context) {
+    // ignore: unused_local_variable
     var media = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: TColor.white,
@@ -89,11 +91,19 @@ class _OnBoardingViewState extends State<OnBoardingView> {
                     icon: Icon(Icons.navigate_next, color: TColor.white),
                     onPressed: () {
                       if (selectPage < 2) {
+                        // If not on the last page, go to the next page
                         selectPage = selectPage + 1;
-
                         controller.jumpToPage(selectPage);
                         setState(() {});
-                      } else {}
+                      } else {
+                        // If on the last page, navigate to SignUpView
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SignUpView(),
+                          ),
+                        );
+                      }
                     },
                   ),
                 ),

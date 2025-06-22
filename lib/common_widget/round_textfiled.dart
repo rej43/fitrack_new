@@ -1,60 +1,60 @@
 import 'package:flutter/material.dart';
-
-import '../../common/color_extension.dart';
+import 'package:fitrack/common/color_extension.dart';
 
 class RoundTextField extends StatelessWidget {
   final TextEditingController? controller;
-  final TextInputType? keyboardType;
   final String hitText;
   final String icon;
-  final Widget? rigtIcon;
+  final TextInputType? keyboardType;
   final bool obscureText;
-  final EdgeInsets? margin;
+  final Widget? rightIcon;
+  final FormFieldValidator<String>? validator;
+
   const RoundTextField({
     super.key,
+    this.controller,
     required this.hitText,
     required this.icon,
-    this.controller,
-    this.margin,
     this.keyboardType,
     this.obscureText = false,
-    this.rigtIcon,
+    this.rightIcon,
+    this.validator,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: margin,
       decoration: BoxDecoration(
         color: TColor.lightgrey,
         borderRadius: BorderRadius.circular(15),
       ),
-      child: TextField(
+      child: TextFormField(
         controller: controller,
-        keyboardType: keyboardType,
         obscureText: obscureText,
+        keyboardType: keyboardType,
+        validator: validator,
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(
-            vertical: 10,
-            horizontal: 10,
+            vertical: 15,
+            horizontal: 15,
           ),
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,
           hintText: hitText,
-          suffixIcon: rigtIcon,
+          hintStyle: TextStyle(color: TColor.grey, fontSize: 12),
           prefixIcon: Container(
             alignment: Alignment.center,
             width: 20,
             height: 20,
             child: Image.asset(
               icon,
-              width: 25,
-              height: 25,
+              width: 20,
+              height: 20,
               fit: BoxFit.contain,
               color: TColor.grey,
             ),
           ),
-          hintStyle: TextStyle(color: TColor.grey, fontSize: 12),
+          suffixIcon: rightIcon,
         ),
       ),
     );

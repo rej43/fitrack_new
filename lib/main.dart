@@ -1,8 +1,6 @@
 import 'package:fitrack/common/color_extension.dart';
-import 'package:fitrack/view/on_boarding/on_boarding_view.dart';
 import 'package:fitrack/view/on_boarding/started_view.dart';
 import 'package:flutter/material.dart';
-
 
 void main() {
   runApp(const MyApp());

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class TColor {
   static Color get primaryColor1 => const Color.fromARGB(255, 173, 246, 212);

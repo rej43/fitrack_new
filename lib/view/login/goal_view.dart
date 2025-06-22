@@ -25,7 +25,7 @@ class _GoalViewState extends State<GoalView> {
 
     {
       "image": "assets/img/goal_2.png",
-      "title": "Lose a Fat",
+      "title": "Lose Fat",
       "subtitle":
           "I have over 20 lbs to lose. I want to\ndrop all this fat and gain muscle\nmass",
     },
@@ -130,7 +130,8 @@ class _GoalViewState extends State<GoalView> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const WelcomeView(),
+                          builder:
+                              (context) => const WelcomeView(firstName: ''),
                         ),
                       );
                     },

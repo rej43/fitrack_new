@@ -3,7 +3,9 @@ import 'package:fitrack/common_widget/round_button.dart';
 import '../../common/color_extension.dart';
 
 class WelcomeView extends StatefulWidget {
-  const WelcomeView({super.key});
+  final String firstName;
+
+  const WelcomeView({super.key, required this.firstName});
 
   @override
   State<WelcomeView> createState() => _WelcomeViewState();
@@ -51,7 +53,8 @@ class _WelcomeViewState extends State<WelcomeView> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const WelcomeView(),
+                      builder:
+                          (context) => WelcomeView(firstName: widget.firstName),
                     ),
                   );
                 },

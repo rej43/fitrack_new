@@ -1,16 +1,69 @@
-# fitrack
+# FiTrack App
 
-A new Flutter project.
+FiTrack is a fitness companion application designed to help users stay fit by tracking their profile details, setting goals, and providing a smooth onboarding experience.
+
+## Features
+
+* **Splash Screen with Animated Logo**: A welcoming splash screen featuring the FiTrack logo that performs a quick 360-degree rotation animation upon app launch.
+* **Onboarding Screens**: Guides new users through initial setup.
+* **Complete Profile Section**:
+    * Allows users to input personal details such as Gender, Date of Birth, Weight, and Height.
+    * Interactive pickers for weight and height selection.
+    * Validation for required fields.
+    * Custom styling for input fields (e.g., icons, rounded containers).
+    * Improved readability with bold text for section titles.
+    * Cleaned numeric displays for weight and height (removed "kg" and "cm" units from the displayed number itself, while retaining the unit labels on the side).
+* **Navigation**: Seamless transition to the Goal Setting screen after profile completion.
+* **Gradient Backgrounds**: Visually appealing linear gradients for certain sections.
+
+## Screenshots
+
+| Splash/Started View (Animated Logo) | Complete Profile View |
+| :---------------------------------- | :-------------------- |
+| ![Splash Screen](Screenshots/StartedView.png) | ![Complete Profile](Screenshots/CompleteProfile.png) |
+
+*(Note: The `FiTrackLogo.png` file is the animated logo)*
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-A few resources to get you started if this is your first Flutter project:
+### Prerequisites
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Before you begin, ensure you have the following installed on your system:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+* [Flutter SDK](https://flutter.dev/docs/get-started/install)
+* [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+
+### Installation
+
+1.  **Clone the repository:**
+    ```bash
+    git clone <repository_url_here>
+    cd FiTrack
+    ```
+    (Replace `<repository_url_here>` with the actual URL of your Git repository if you have one.)
+
+2.  **Install dependencies:**
+    Navigate to the project root and run:
+    ```bash
+    flutter pub get
+    ```
+
+3.  **Ensure assets are configured:**
+    Verify your `pubspec.yaml` file includes the `assets` folder:
+    ```yaml
+    flutter:
+      uses-material-design: true
+      assets:
+        - assets/
+        - assets/img/ # If you have images in assets/img/
+    ```
+    After modifying `pubspec.yaml`, always run `flutter pub get` again.
+
+### Running the App
+
+To run the app on a connected device or emulator:
+
+```bash
+flutter run

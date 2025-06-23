@@ -39,10 +39,9 @@ Before you begin, ensure you have the following installed on your system:
 
 1.  **Clone the repository:**
     ```bash
-    git clone <repository_url_here>
+    git clone https://github.com/rej43/fitrack_new.git
     cd FiTrack
     ```
-    (Replace `<repository_url_here>` with the actual URL of your Git repository if you have one.)
 
 2.  **Install dependencies:**
     Navigate to the project root and run:

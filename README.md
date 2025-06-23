@@ -18,8 +18,8 @@ FiTrack is a fitness companion application designed to help users stay fit by tr
 
 ## Screenshots
 
-| Splash/Started View (Animated Logo) | Complete Profile View |
-| :---------------------------------- | :-------------------- |
+| Splash/Started View  | Complete Profile View |
+| :------------------- | :-------------------- |
 | ![Splash Screen](Screenshots/StartedView.png) | ![Complete Profile](Screenshots/CompleteProfile.png) |
 
 *(Note: The `FiTrackLogo.png` file is the animated logo)*

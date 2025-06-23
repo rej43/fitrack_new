@@ -1,3 +1,4 @@
+import 'package:fitrack/view/home/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fitrack/common_widget/round_button.dart';
 import '../../common/color_extension.dart';
@@ -52,10 +53,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder:
-                          (context) => WelcomeView(firstName: widget.firstName),
-                    ),
+                    MaterialPageRoute(builder: (context) => HomeScreen()),
                   );
                 },
               ),

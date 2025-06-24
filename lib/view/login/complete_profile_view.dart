@@ -190,7 +190,7 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                                                     child: Text(
                                                       name,
                                                       style: TextStyle(
-                                                        color: TColor.grey,
+                                                        color: TColor.black,
                                                         fontSize: 14,
                                                       ),
                                                     ),
@@ -281,24 +281,6 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                                   ),
                                 ),
                               ),
-                              rightWidget: Container(
-                                width: 50,
-                                height: 50,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: TColor.primaryG,
-                                  ),
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Text(
-                                  "KG",
-                                  style: TextStyle(
-                                    color: TColor.grey,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
                             ),
                             if (_weightErrorText != null)
                               Padding(
@@ -339,24 +321,6 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                                       color: TColor.black,
                                       fontSize: 14,
                                     ),
-                                  ),
-                                ),
-                              ),
-                              rightWidget: Container(
-                                width: 50,
-                                height: 50,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: TColor.primaryG,
-                                  ),
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Text(
-                                  "CM",
-                                  style: TextStyle(
-                                    color: TColor.grey,
-                                    fontSize: 12,
                                   ),
                                 ),
                               ),

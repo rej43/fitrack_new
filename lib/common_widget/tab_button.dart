@@ -27,7 +27,7 @@ class TabButton extends StatelessWidget {
           children: [
             ColorFiltered(
               colorFilter: ColorFilter.mode(
-                isActive ? TColor.primaryColor1 : TColor.black,
+                isActive ? TColor.primaryColor2 : TColor.black,
                 BlendMode.srcIn,
               ),
               child: Image.asset(icon, width: 27, height: 27),

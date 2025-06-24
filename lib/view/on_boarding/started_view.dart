@@ -82,7 +82,7 @@ class _StartedViewState extends State<StartedView>
                 SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: RoundButtton(
+                    child: RoundButton(
                       title: "Get Started",
                       onPressed: () {
                         Navigator.push(

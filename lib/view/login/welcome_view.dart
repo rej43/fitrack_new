@@ -34,7 +34,7 @@ class _WelcomeViewState extends State<WelcomeView> {
               ),
               SizedBox(height: media.width * 0.1),
               Text(
-                "Welcome, Pratik",
+                "Welcome, Rejisha",
                 style: TextStyle(
                   color: TColor.black,
                   fontSize: 22,
@@ -48,7 +48,7 @@ class _WelcomeViewState extends State<WelcomeView> {
               ),
               const Spacer(),
 
-              RoundButtton(
+              RoundButton(
                 title: "Go To Home",
                 onPressed: () {
                   Navigator.push(

@@ -106,7 +106,7 @@ class _LoginViewState extends State<LoginView> {
                   ],
                 ),
                 SizedBox(height: media.width * 0.1),
-                RoundButtton(
+                RoundButton(
                   title: "Login",
                   onPressed: () {
                     // Simulate successful login and fetching first name

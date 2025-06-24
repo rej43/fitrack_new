@@ -342,7 +342,7 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                           ],
                         ),
                         SizedBox(height: media.width * 0.07),
-                        RoundButtton(
+                        RoundButton(
                           title: "Next >",
                           onPressed: () {
                             bool isFormValid =

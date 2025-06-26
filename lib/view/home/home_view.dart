@@ -425,7 +425,6 @@ class _HomeViewState extends State<HomeView> {
                                     ),
                                   ),
                                 ),
-                                const Spacer(),
                                 Image.asset(
                                   "assets/img/sleep_grap.png",
                                   width: double.maxFinite,

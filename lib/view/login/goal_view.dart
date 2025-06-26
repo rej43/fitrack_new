@@ -141,7 +141,7 @@ class _GoalViewState extends State<GoalView> {
                   ),
                   const Spacer(),
                   SizedBox(height: media.width * 0.05),
-                  RoundButtton(
+                  RoundButton(
                     title: "Confirm",
                     onPressed: () {
                       Navigator.push(

@@ -27,12 +27,12 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
   String? _heightErrorText;
 
   List<double> weightOptions = List.generate(
-    171,
-    (index) => (30.0 + index).toDouble(),
+    1001,
+    (index) => 30.0 + index * 0.1,
   );
   List<double> heightOptions = List.generate(
-    101,
-    (index) => (120.0 + index).toDouble(),
+    801,
+    (index) => 120.0 + index * 0.1,
   );
 
   @override
@@ -106,7 +106,7 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                       options.map((value) {
                         return Text(
                           value.toStringAsFixed(1),
-                          style: TextStyle(fontSize: 20),
+                          style: const TextStyle(fontSize: 20),
                         );
                       }).toList(),
                 ),
@@ -190,7 +190,7 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                                                     child: Text(
                                                       name,
                                                       style: TextStyle(
-                                                        color: TColor.grey,
+                                                        color: TColor.black,
                                                         fontSize: 14,
                                                       ),
                                                     ),
@@ -281,24 +281,6 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                                   ),
                                 ),
                               ),
-                              rightWidget: Container(
-                                width: 50,
-                                height: 50,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: TColor.primaryG,
-                                  ),
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Text(
-                                  "KG",
-                                  style: TextStyle(
-                                    color: TColor.grey,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
                             ),
                             if (_weightErrorText != null)
                               Padding(
@@ -342,24 +324,6 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                                   ),
                                 ),
                               ),
-                              rightWidget: Container(
-                                width: 50,
-                                height: 50,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: TColor.primaryG,
-                                  ),
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Text(
-                                  "CM",
-                                  style: TextStyle(
-                                    color: TColor.grey,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
                             ),
                             if (_heightErrorText != null)
                               Padding(
@@ -378,7 +342,7 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                           ],
                         ),
                         SizedBox(height: media.width * 0.07),
-                        RoundButtton(
+                        RoundButton(
                           title: "Next >",
                           onPressed: () {
                             bool isFormValid =

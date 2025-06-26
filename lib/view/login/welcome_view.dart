@@ -1,4 +1,4 @@
-import 'package:fitrack/view/home/home_screen.dart';
+import 'package:fitrack/view/main_tab/maintab_view.dart';
 import 'package:flutter/material.dart';
 import 'package:fitrack/common_widget/round_button.dart';
 import '../../common/color_extension.dart';
@@ -34,7 +34,7 @@ class _WelcomeViewState extends State<WelcomeView> {
               ),
               SizedBox(height: media.width * 0.1),
               Text(
-                "Welcome, Stefani",
+                "Welcome, Rejisha",
                 style: TextStyle(
                   color: TColor.black,
                   fontSize: 22,
@@ -48,12 +48,14 @@ class _WelcomeViewState extends State<WelcomeView> {
               ),
               const Spacer(),
 
-              RoundButtton(
+              RoundButton(
                 title: "Go To Home",
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => HomeScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const MainTabView(),
+                    ),
                   );
                 },
               ),

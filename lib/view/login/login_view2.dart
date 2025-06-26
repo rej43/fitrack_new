@@ -1,22 +1,29 @@
 import 'package:fitrack/common/color_extension.dart';
 import 'package:fitrack/common_widget/round_button.dart';
 import 'package:fitrack/common_widget/round_textfiled.dart';
-import 'package:fitrack/view/login/complete_profile_view.dart';
-import 'package:fitrack/view/login/forgot_pass.dart';
 import 'package:flutter/material.dart';
-// ignore: unused_import
 import 'package:fitrack/view/login/welcome_view.dart';
-import 'package:fitrack/view/admin_home/admin_dashboard.dart';
+import 'package:fitrack/view/home/home_view.dart';
 
-class LoginView extends StatefulWidget {
-  const LoginView({super.key});
+class LoginView2 extends StatefulWidget {
+  const LoginView2({super.key});
 
   @override
-  State<LoginView> createState() => _LoginViewState();
+  State<LoginView2> createState() => _LoginViewState();
 }
 
-class _LoginViewState extends State<LoginView> {
+class _LoginViewState extends State<LoginView2> {
   bool _obscureText = true;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -24,17 +31,18 @@ class _LoginViewState extends State<LoginView> {
       backgroundColor: TColor.white,
       body: SingleChildScrollView(
         child: SafeArea(
-          child: Container(
-            height: media.height * 0.9,
+          child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                SizedBox(height: media.width * 0.1),
                 Image.asset(
                   "assets/img/login.png",
                   height: media.width * 0.4,
                   fit: BoxFit.contain,
                 ),
+                SizedBox(height: media.width * 0.05),
                 Text(
                   "Welcome Back",
                   style: TextStyle(
@@ -44,11 +52,11 @@ class _LoginViewState extends State<LoginView> {
                   ),
                 ),
                 SizedBox(height: media.width * 0.05),
-                SizedBox(height: media.width * 0.04),
-                const RoundTextField(
+                RoundTextField(
                   hitText: "Email",
                   icon: "assets/img/email.png",
                   keyboardType: TextInputType.emailAddress,
+                  controller: _emailController,
                 ),
                 SizedBox(height: media.width * 0.04),
                 RoundTextField(
@@ -83,12 +91,7 @@ class _LoginViewState extends State<LoginView> {
                   children: [
                     TextButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ForgotPassword(),
-                          ),
-                        );
+                        print("Forgot password clicked!");
                       },
                       child: Text(
                         "Forgot your password?",
@@ -101,38 +104,52 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ],
                 ),
-                const Spacer(),
+                SizedBox(height: media.width * 0.1),
                 RoundButton(
                   title: "Login",
                   onPressed: () {
-                    // Admin login logic
-                    // Get email and password from controllers (need to add controllers if not present)
-                    final emailController = TextEditingController();
-                    final passwordController = TextEditingController();
-                    // If you already have controllers, use them instead
-                    final email = emailController.text.trim();
-                    final password = passwordController.text.trim();
-                    if (email == 'admin@fitrackapp.com' &&
-                        password == 'fitrack@123admin') {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AdminDashboard(),
+                    final email = _emailController.text.trim();
+                    final password = _passwordController.text.trim();
+
+                    print("Email entered: '$email'");
+                    print("Password entered: '$password'");
+
+                    if (email.isEmpty || password.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            "Please enter your email and password.",
+                          ),
+                          backgroundColor: Colors.red,
                         ),
                       );
                       return;
                     }
+
+                    if (email == 'admin@fitrackapp.com' &&
+                        password == 'admin123') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HomeView(),
+                        ),
+                      );
+                      return;
+                    }
+
+                    String simulatedFirstName = "User";
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const CompleteProfileView(),
+                        builder:
+                            (context) =>
+                                WelcomeView(firstName: simulatedFirstName),
                       ),
                     );
                   },
                 ),
                 SizedBox(height: media.width * 0.04),
                 Row(
-                  // crossAxisAlignment: CrossAxisAlignment.,
                   children: [
                     Expanded(
                       child: Container(

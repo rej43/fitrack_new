@@ -169,7 +169,7 @@ class _SignUpViewState extends State<SignUpView> {
                     ],
                   ),
                   SizedBox(height: media.width * 0.05),
-                  RoundButtton(
+                  RoundButton(
                     title: "Register",
                     onPressed: () {
                       if (_formKey.currentState?.validate() ?? false) {

@@ -32,8 +32,12 @@ class _MainTabViewState extends State<MainTabView> {
             ),
           ],
         ),
+<<<<<<< HEAD
         child: SafeArea(
           // safe area for bottom notch
+=======
+        child: SafeArea( // safe area for bottom notch
+>>>>>>> origin/main
           child: SizedBox(
             height: 80,
             child: Row(

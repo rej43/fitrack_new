@@ -101,11 +101,7 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ],
                 ),
-<<<<<<< HEAD
-                const Spacer(),
-=======
                 SizedBox(height: media.width * 0.1),
->>>>>>> origin/main
                 RoundButton(
                   title: "Login",
                   onPressed: () {

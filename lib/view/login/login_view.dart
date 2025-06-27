@@ -1,6 +1,7 @@
 import 'package:fitrack/common/color_extension.dart';
 import 'package:fitrack/common_widget/round_button.dart';
 import 'package:fitrack/common_widget/round_textfiled.dart';
+import 'package:fitrack/view/home/home_view.dart';
 import 'package:fitrack/view/login/complete_profile_view.dart';
 import 'package:fitrack/view/login/forgot_pass.dart';
 import 'package:flutter/material.dart';
@@ -119,12 +120,11 @@ class _LoginViewState extends State<LoginView> {
                   onPressed: () {
                     final email = _emailController.text.trim();
                     final password = _passwordController.text.trim();
-                    if (email == 'admin@fitrackapp.com' &&
-                        password == 'fitrack@123') {
+                    if (email == 'user@fitrackapp.com' && password == 'fit') {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const AdminDashboard(),
+                          builder: (context) => const HomeView(),
                         ),
                       );
                       return;

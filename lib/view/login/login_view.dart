@@ -17,6 +17,16 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView> {
   bool _obscureText = true;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -45,16 +55,18 @@ class _LoginViewState extends State<LoginView> {
                 ),
                 SizedBox(height: media.width * 0.05),
                 SizedBox(height: media.width * 0.04),
-                const RoundTextField(
+                RoundTextField(
                   hitText: "Email",
                   icon: "assets/img/email.png",
                   keyboardType: TextInputType.emailAddress,
+                  controller: _emailController,
                 ),
                 SizedBox(height: media.width * 0.04),
                 RoundTextField(
                   hitText: "Password",
                   icon: "assets/img/lock.png",
                   obscureText: _obscureText,
+                  controller: _passwordController,
                   rightIcon: TextButton(
                     onPressed: () {
                       setState(() {
@@ -105,15 +117,10 @@ class _LoginViewState extends State<LoginView> {
                 RoundButton(
                   title: "Login",
                   onPressed: () {
-                    // Admin login logic
-                    // Get email and password from controllers (need to add controllers if not present)
-                    final emailController = TextEditingController();
-                    final passwordController = TextEditingController();
-                    // If you already have controllers, use them instead
-                    final email = emailController.text.trim();
-                    final password = passwordController.text.trim();
+                    final email = _emailController.text.trim();
+                    final password = _passwordController.text.trim();
                     if (email == 'admin@fitrackapp.com' &&
-                        password == 'fitrack@123admin') {
+                        password == 'fitrack@123') {
                       Navigator.push(
                         context,
                         MaterialPageRoute(

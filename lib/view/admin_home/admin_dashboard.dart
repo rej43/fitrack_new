@@ -64,7 +64,7 @@ class _AdminDashboardState extends State<AdminDashboard>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 7, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -117,25 +117,20 @@ class _AdminDashboardState extends State<AdminDashboard>
         ),
         bottom: TabBar(
           controller: _tabController,
-          isScrollable: true,
+          isScrollable: false,
           labelColor: TColor.primaryColor2,
           unselectedLabelColor: TColor.grey,
           indicatorColor: TColor.primaryColor2,
           tabs: const [
-            Tab(text: 'Dashboard', icon: Icon(Icons.dashboard)),
-            Tab(text: 'Users', icon: Icon(Icons.people)),
-            Tab(text: 'Content', icon: Icon(Icons.fitness_center)),
             Tab(text: 'Analytics', icon: Icon(Icons.bar_chart)),
-            Tab(text: 'Feedback', icon: Icon(Icons.feedback)),
             Tab(text: 'Notifications', icon: Icon(Icons.notifications)),
-            Tab(text: 'Settings', icon: Icon(Icons.settings)),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          // Dashboard Tab
+          // Analytics Tab
           SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -324,6 +319,18 @@ class _AdminDashboardState extends State<AdminDashboard>
                       ],
                     ),
                   ),
+                  SizedBox(height: media.width * 0.1),
+                ],
+              ),
+            ),
+          ),
+          // Notification Tab
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   SizedBox(height: media.width * 0.07),
                   Container(
                     width: double.infinity,
@@ -412,99 +419,7 @@ class _AdminDashboardState extends State<AdminDashboard>
               ),
             ),
           ),
-          // User Management Tab
-          _AdminSectionPlaceholder(
-            icon: Icons.people,
-            title: 'User Management',
-            description: 'View, search, block/unblock, and manage users.',
-          ),
-          // Content Management Tab
-          _AdminSectionPlaceholder(
-            icon: Icons.fitness_center,
-            title: 'Content Management',
-            description: 'Manage workouts, diet plans, and challenges.',
-          ),
-          // Analytics Tab
-          _AdminSectionPlaceholder(
-            icon: Icons.bar_chart,
-            title: 'Analytics',
-            description: 'View app usage, engagement, and progress trends.',
-          ),
-          // Feedback & Support Tab
-          _AdminSectionPlaceholder(
-            icon: Icons.feedback,
-            title: 'Feedback & Support',
-            description:
-                'View and respond to user feedback and support tickets.',
-          ),
-          // Notification History Tab
-          _AdminSectionPlaceholder(
-            icon: Icons.notifications,
-            title: 'Notification History',
-            description: 'View a log of all sent notifications.',
-          ),
-          // Admin Settings Tab
-          _AdminSectionPlaceholder(
-            icon: Icons.settings,
-            title: 'Admin Settings',
-            description: 'Manage your profile, password, and other admins.',
-          ),
         ],
-      ),
-    );
-  }
-}
-
-class _AdminSectionPlaceholder extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String description;
-  const _AdminSectionPlaceholder({
-    required this.icon,
-    required this.title,
-    required this.description,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    var media = MediaQuery.of(context).size;
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: media.width * 0.1,
-          vertical: 40,
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(32),
-          decoration: BoxDecoration(
-            color: TColor.white,
-            borderRadius: BorderRadius.circular(25),
-            boxShadow: [
-              BoxShadow(color: TColor.grey.withOpacity(0.08), blurRadius: 8),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 48, color: TColor.primaryColor2),
-              const SizedBox(height: 16),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: TColor.black,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                description,
-                style: TextStyle(fontSize: 15, color: TColor.grey),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

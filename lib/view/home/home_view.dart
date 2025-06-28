@@ -46,7 +46,7 @@ class _HomeViewState extends State<HomeView> {
                           style: TextStyle(color: TColor.grey, fontSize: 15),
                         ),
                         Text(
-                          "Rejisha Bharati",
+                          "Joe Goldberg",
                           style: TextStyle(
                             color: TColor.black,
                             fontSize: 20,

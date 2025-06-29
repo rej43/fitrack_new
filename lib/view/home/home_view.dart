@@ -2,6 +2,7 @@ import 'package:dotted_dashed_line/dotted_dashed_line.dart';
 import 'package:fitrack/common/color_extension.dart';
 import 'package:fitrack/common_widget/round_button.dart';
 import 'package:fitrack/view/home/activity_traker_view.dart';
+import 'package:fitrack/view/home/view_more.dart';
 import 'package:simple_animation_progress_bar/simple_animation_progress_bar.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 import 'package:fitrack/view/home/notification_view.dart';
@@ -116,7 +117,14 @@ class _HomeViewState extends State<HomeView> {
                               type: RoundButtonType.bgSGradient,
                               fontSize: 12,
                               fontWeight: FontWeight.w100,
-                              onPressed: () {},
+                              onPressed: () {
+                                 Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const BMIDetailPage(),
+                    ),
+                );
+                              },
                             ),
                           ),
                         ],

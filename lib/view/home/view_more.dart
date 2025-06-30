@@ -13,7 +13,7 @@ class BMIDetailPage extends StatelessWidget {
     Color categoryColor = Colors.green;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("BMI Details")),
+      appBar: AppBar(backgroundColor: TColor.primaryColor1,title: const Text("BMI Details")),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(

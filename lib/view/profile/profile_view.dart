@@ -2,6 +2,7 @@ import 'package:fitrack/common/color_extension.dart';
 
 import 'package:fitrack/common_widget/setting_row.dart';
 import 'package:fitrack/common_widget/title_subtitle_cell.dart';
+import 'package:fitrack/view/profile/personaldata_view.dart';
 import 'package:flutter/material.dart';
 import 'package:fitrack/common_widget/round_button.dart';
 
@@ -141,15 +142,13 @@ class _ProfileViewState extends State<ProfileView> {
               const SizedBox(height: 25),
               Container(
                 padding: const EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 15,
+                  vertical: 15,
+                  horizontal: 10,
                 ),
                 decoration: BoxDecoration(
                   color: TColor.white,
                   borderRadius: BorderRadius.circular(15),
-                  boxShadow: [
-                    BoxShadow(color: TColor.grey, blurRadius: 2),
-                  ],
+                  boxShadow: [BoxShadow(color: TColor.grey, blurRadius: 2)],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,7 +171,17 @@ class _ProfileViewState extends State<ProfileView> {
                         return SettingRow(
                           icon: iObj["image"].toString(),
                           title: iObj["name"].toString(),
-                          onPressed: () {},
+                          onPressed: () {
+                            final tag = iObj["tag"].toString();
+                            if (tag == "1") {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const PersonalDataScreen(),
+                                ),
+                              );
+                            }
+                          },
                         );
                       },
                     ),
@@ -183,14 +192,12 @@ class _ProfileViewState extends State<ProfileView> {
               Container(
                 padding: const EdgeInsets.symmetric(
                   vertical: 10,
-                  horizontal: 15,
+                  horizontal: 10,
                 ),
                 decoration: BoxDecoration(
                   color: TColor.white,
                   borderRadius: BorderRadius.circular(15),
-                  boxShadow:  [
-                    BoxShadow(color: TColor.grey, blurRadius: 2),
-                  ],
+                  boxShadow: [BoxShadow(color: TColor.grey, blurRadius: 2)],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -296,15 +303,13 @@ class _ProfileViewState extends State<ProfileView> {
               const SizedBox(height: 25),
               Container(
                 padding: const EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 15,
+                  vertical: 15,
+                  horizontal: 10,
                 ),
                 decoration: BoxDecoration(
                   color: TColor.white,
                   borderRadius: BorderRadius.circular(15),
-                  boxShadow:  [
-                    BoxShadow(color: TColor.grey, blurRadius: 2),
-                  ],
+                  boxShadow: [BoxShadow(color: TColor.grey, blurRadius: 2)],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

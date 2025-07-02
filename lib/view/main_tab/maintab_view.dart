@@ -1,8 +1,11 @@
 import 'package:fitrack/common/color_extension.dart';
 import 'package:fitrack/common_widget/tab_button.dart';
+import 'package:fitrack/view/home/activity_traker_view.dart';
 import 'package:fitrack/view/home/home_view.dart';
 import 'package:fitrack/view/profile/profile_view.dart';
 import 'package:flutter/material.dart';
+import 'package:fitrack/view/main_tab/maintab_view.dart';
+
 
 class MainTabView extends StatefulWidget {
   const MainTabView({super.key});
@@ -57,7 +60,7 @@ class _MainTabViewState extends State<MainTabView> {
                   onTap: () {
                     setState(() {
                       selectTab = 1;
-                      currentTab = const HomeView(); // placeholder
+                      currentTab = const ActivityTrakerView(); // placeholder
                     });
                   },
                 ),

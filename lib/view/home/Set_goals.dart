@@ -31,8 +31,12 @@ class _SetGoalsScreenState extends State<SetGoalsView> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: TColor.primaryColor1,
-        title: const Text("Set Today's Goals"),
+        title: const Text(
+          "Set Today's Goals",
+          style: TextStyle(fontWeight: FontWeight.w700),
+        ),
       ),
+
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -49,36 +53,35 @@ class _SetGoalsScreenState extends State<SetGoalsView> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: _addGoal,
-                  child: const Text('Add'),
-                ),
+                ElevatedButton(onPressed: _addGoal, child: const Text('Add')),
               ],
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: _goals.isEmpty
-                  ? const Center(child: Text('No goals yet.'))
-                  : ListView.builder(
-                      itemCount: _goals.length,
-                      itemBuilder: (context, index) {
-                        final goal = _goals[index];
-                        return ListTile(
-                          leading: Checkbox(
-                            value: goal.isCompleted,
-                            onChanged: (_) => _toggleGoal(index),
-                          ),
-                          title: Text(
-                            goal.text,
-                            style: TextStyle(
-                              decoration: goal.isCompleted
-                                  ? TextDecoration.lineThrough
-                                  : null,
+              child:
+                  _goals.isEmpty
+                      ? const Center(child: Text('No goals yet.'))
+                      : ListView.builder(
+                        itemCount: _goals.length,
+                        itemBuilder: (context, index) {
+                          final goal = _goals[index];
+                          return ListTile(
+                            leading: Checkbox(
+                              value: goal.isCompleted,
+                              onChanged: (_) => _toggleGoal(index),
                             ),
-                          ),
-                        );
-                      },
-                    ),
+                            title: Text(
+                              goal.text,
+                              style: TextStyle(
+                                decoration:
+                                    goal.isCompleted
+                                        ? TextDecoration.lineThrough
+                                        : null,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
             ),
           ],
         ),

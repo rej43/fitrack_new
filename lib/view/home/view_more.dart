@@ -7,13 +7,16 @@ class BMIDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double bmi = 22.5; // Static example BMI
+    double bmi = 19.1; // Static example BMI
 
     String category = "Normal Weight";
     Color categoryColor = Colors.green;
 
     return Scaffold(
-      appBar: AppBar(backgroundColor: TColor.primaryColor1,title: const Text("BMI Details")),
+      appBar: AppBar(
+        backgroundColor: TColor.primaryColor1,
+        title: const Text("BMI Details"),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -33,10 +36,10 @@ class BMIDetailPage extends StatelessWidget {
                     widget: Container(
                       child: Text(
                         bmi.toStringAsFixed(1),
-                        style:  TextStyle(
+                        style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
-                          color:TColor.secondaryColor2,
+                          color: TColor.secondaryColor2,
                         ),
                       ),
                     ),

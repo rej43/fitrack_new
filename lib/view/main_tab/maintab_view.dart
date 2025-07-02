@@ -6,7 +6,6 @@ import 'package:fitrack/view/profile/profile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:fitrack/view/main_tab/maintab_view.dart';
 
-
 class MainTabView extends StatefulWidget {
   const MainTabView({super.key});
 
@@ -60,7 +59,7 @@ class _MainTabViewState extends State<MainTabView> {
                   onTap: () {
                     setState(() {
                       selectTab = 1;
-                      currentTab = const ActivityTrakerView(); // placeholder
+                      currentTab = const ActivityTrackerView();
                     });
                   },
                 ),

@@ -28,18 +28,8 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
           children: [
             _buildHeader(),
             SizedBox(height: 20),
-           
-            RoundButton(
-                title: "Go To Home",
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => NutritionPage(),
-                    ),
-                  );
-                },
-              ),
+
+            RoundButton(title: "Log Sleep", onPressed: _logSleep),
             SizedBox(height: 20),
             RoundButton(title: "Log Workout", onPressed: _logWorkout),
             SizedBox(height: 20),

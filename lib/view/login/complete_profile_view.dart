@@ -1,6 +1,7 @@
 import 'package:fitrack/common/color_extension.dart';
 import 'package:fitrack/common_widget/round_textfiled.dart';
 import 'package:fitrack/view/login/goal_view.dart';
+import 'package:fitrack/view/login/body_type.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fitrack/common_widget/round_button.dart';
@@ -382,7 +383,8 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const GoalView(),
+                                  builder:
+                                      (context) => const BodyTypeSelectionPage(),
                                 ),
                               );
                             } else {

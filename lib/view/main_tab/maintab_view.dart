@@ -63,8 +63,8 @@ class _MainTabViewState extends State<MainTabView> {
                   },
                 ),
                 TabButton(
-                  icon: "assets/img/group.png",
-                  label: 'Community Feature',
+                  icon: "assets/img/united.png",
+                  label: 'Community',
                   isActive: selectTab == 2,
                   onTap: () {
                     setState(() {

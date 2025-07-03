@@ -15,6 +15,8 @@ class _GoalViewState extends State<GoalView> {
   final CarouselSliderController buttonCarouselController =
       CarouselSliderController();
 
+  int selectedIndex = 0;
+
   List goalArr = [
     {
       "image": "assets/img/goal_1.png",
@@ -63,65 +65,79 @@ class _GoalViewState extends State<GoalView> {
         child: Stack(
           children: [
             Center(
-              child: CarouselSlider(
-                items:
-                    goalArr
-                        .map(
-                          (gObj) => Container(
-                            decoration: BoxDecoration(
-                              color: TColor.primaryColor1,
-                              borderRadius: BorderRadius.circular(25),
+              child: CarouselSlider.builder(
+                carouselController: buttonCarouselController,
+                itemCount: goalArr.length,
+                itemBuilder: (context, index, realIndex) {
+                  var gObj = goalArr[index];
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedIndex = index;
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color:
+                            selectedIndex == index
+                                ? TColor
+                                    .primaryColor2 // Highlight selected
+                                : TColor.primaryColor1,
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        vertical: media.width * 0.1,
+                        horizontal: 25,
+                      ),
+                      alignment: Alignment.center,
+                      child: FittedBox(
+                        child: Column(
+                          children: [
+                            Image.asset(
+                              gObj["image"].toString(),
+                              width: media.width * 0.5,
+                              fit: BoxFit.fitWidth,
                             ),
-                            padding: EdgeInsets.symmetric(
-                              vertical: media.width * 0.1,
-                              horizontal: 25,
-                            ),
-                            alignment: Alignment.center,
-                            child: FittedBox(
-                              child: Column(
-                                children: [
-                                  Image.asset(
-                                    gObj["image"].toString(),
-                                    width: media.width * 0.5,
-                                    fit: BoxFit.fitWidth,
-                                  ),
-                                  SizedBox(height: media.width * 0.1),
-                                  Text(
-                                    gObj["title"].toString(),
-                                    style: TextStyle(
-                                      color: TColor.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  Container(
-                                    width: media.width * 0.1,
-                                    height: 1,
-                                    color: TColor.white,
-                                  ),
-                                  SizedBox(height: media.width * 0.02),
-                                  Text(
-                                    gObj["subtitle"].toString(),
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: TColor.black,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
+                            SizedBox(height: media.width * 0.1),
+                            Text(
+                              gObj["title"].toString(),
+                              style: TextStyle(
+                                color: TColor.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
-                          ),
-                        )
-                        .toList(),
-                carouselController: buttonCarouselController,
-
+                            Container(
+                              width: media.width * 0.1,
+                              height: 1,
+                              color: TColor.white,
+                            ),
+                            SizedBox(height: media.width * 0.02),
+                            Text(
+                              gObj["subtitle"].toString(),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: TColor.black,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
                 options: CarouselOptions(
                   autoPlay: false,
                   enlargeCenterPage: true,
                   viewportFraction: 0.7,
                   aspectRatio: 0.74,
-                  initialPage: 0,
+                  initialPage: selectedIndex,
+                  onPageChanged: (index, reason) {
+                    setState(() {
+                      selectedIndex = index;
+                    });
+                  },
                 ),
               ),
             ),
@@ -132,7 +148,7 @@ class _GoalViewState extends State<GoalView> {
                 children: [
                   SizedBox(height: media.width * 0.05),
                   Text(
-                    "What is your goal ?",
+                    "What is your goal?",
                     style: TextStyle(
                       color: TColor.black,
                       fontSize: 26,

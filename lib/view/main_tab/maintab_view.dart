@@ -4,7 +4,6 @@ import 'package:fitrack/view/home/activity_traker_view.dart';
 import 'package:fitrack/view/home/home_view.dart';
 import 'package:fitrack/view/profile/profile_view.dart';
 import 'package:flutter/material.dart';
-import 'package:fitrack/view/main_tab/maintab_view.dart';
 
 class MainTabView extends StatefulWidget {
   const MainTabView({super.key});

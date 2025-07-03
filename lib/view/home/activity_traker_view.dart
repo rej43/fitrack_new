@@ -1,5 +1,6 @@
 import 'package:fitrack/common/color_extension.dart';
 import 'package:fitrack/common_widget/round_button.dart';
+import 'package:fitrack/view/home/calories_view.dart';
 import 'package:flutter/material.dart';
 
 class ActivityTrackerView extends StatefulWidget {
@@ -27,7 +28,18 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
           children: [
             _buildHeader(),
             SizedBox(height: 20),
-            RoundButton(title: "Log Sleep", onPressed: _logSleep),
+           
+            RoundButton(
+                title: "Go To Home",
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NutritionPage(),
+                    ),
+                  );
+                },
+              ),
             SizedBox(height: 20),
             RoundButton(title: "Log Workout", onPressed: _logWorkout),
             SizedBox(height: 20),

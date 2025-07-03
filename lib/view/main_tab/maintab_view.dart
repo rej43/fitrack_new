@@ -4,7 +4,6 @@ import 'package:fitrack/view/home/activity_traker_view.dart';
 import 'package:fitrack/view/home/home_view.dart';
 import 'package:fitrack/view/profile/profile_view.dart';
 import 'package:flutter/material.dart';
-import 'package:fitrack/view/main_tab/maintab_view.dart';
 
 class MainTabView extends StatefulWidget {
   const MainTabView({super.key});
@@ -64,8 +63,8 @@ class _MainTabViewState extends State<MainTabView> {
                   },
                 ),
                 TabButton(
-                  icon: "assets/img/analysis.png",
-                  label: 'Analytics',
+                  icon: "assets/img/group.png",
+                  label: 'Community Feature',
                   isActive: selectTab == 2,
                   onTap: () {
                     setState(() {

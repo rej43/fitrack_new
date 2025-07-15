@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:fitrack/common_widget/round_button.dart';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+import 'package:fitrack/view/on_boarding/started_view.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -20,13 +21,12 @@ class _ProfileViewState extends State<ProfileView> {
 
   List accountArr = [
     {"image": "assets/img/user.png", "name": "Personal Data", "tag": "1"},
-    {"image": "assets/img/notes.png", "name": "Achievement", "tag": "2"},
   ];
 
   List otherArr = [
     {"image": "assets/img/contact-mail.png", "name": "Contact Us", "tag": "5"},
     {"image": "assets/img/privacy.png", "name": "Privacy Policy", "tag": "6"},
-    {"image": "assets/img/setting.png", "name": "Setting", "tag": "7"},
+    {"image": "assets/img/setting.png", "name": "Logout", "tag": "7"},
   ];
   @override
   Widget build(BuildContext context) {
@@ -98,24 +98,6 @@ class _ProfileViewState extends State<ProfileView> {
                           ),
                         ),
                       ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: 70,
-                    height: 25,
-                    child: RoundButton(
-                      title: "Edit",
-                      type: RoundButtonType.bgGradient,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      onPressed: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => const ActivityTrackerView(),
-                        //   ),
-                        // );
-                      },
                     ),
                   ),
                 ],
@@ -333,7 +315,79 @@ class _ProfileViewState extends State<ProfileView> {
                         return SettingRow(
                           icon: iObj["image"].toString(),
                           title: iObj["name"].toString(),
-                          onPressed: () {},
+                          onPressed: () {
+                            final tag = iObj["tag"].toString();
+                            if (tag == "5") {
+                              showDialog(
+                                context: context,
+                                builder:
+                                    (context) => AlertDialog(
+                                      title: const Text('Contact Us'),
+                                      content: const Text(
+                                        'Email: support@fitrackapp.com\nPhone: +1 234 567 8901\nAddress: 123 Fit St, Wellness City',
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed:
+                                              () => Navigator.pop(context),
+                                          child: const Text('OK'),
+                                        ),
+                                      ],
+                                    ),
+                              );
+                            } else if (tag == "6") {
+                              showDialog(
+                                context: context,
+                                builder:
+                                    (context) => AlertDialog(
+                                      title: const Text('Privacy Policy'),
+                                      content: const Text(
+                                        'We value your privacy. Your data is secure and never shared with third parties. For more info, visit our website.',
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed:
+                                              () => Navigator.pop(context),
+                                          child: const Text('OK'),
+                                        ),
+                                      ],
+                                    ),
+                              );
+                            } else if (tag == "7") {
+                              // Show logout confirmation dialog
+                              showDialog(
+                                context: context,
+                                builder:
+                                    (context) => AlertDialog(
+                                      title: const Text('Logout'),
+                                      content: const Text(
+                                        'Are you sure you want to logout?',
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed:
+                                              () => Navigator.pop(context),
+                                          child: const Text('No'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(
+                                              context,
+                                            ).pushAndRemoveUntil(
+                                              MaterialPageRoute(
+                                                builder:
+                                                    (_) => const StartedView(),
+                                              ),
+                                              (route) => false,
+                                            );
+                                          },
+                                          child: const Text('Yes'),
+                                        ),
+                                      ],
+                                    ),
+                              );
+                            }
+                          },
                         );
                       },
                     ),

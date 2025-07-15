@@ -38,6 +38,8 @@ dependencies:
   animated_toggle_switch: ^0.6.2
   advanced_bmi: ^1.0.0
   syncfusion_flutter_charts: ^30.1.37
+  shared_preferences: ^2.2.2
+  pedometer: ^4.0.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

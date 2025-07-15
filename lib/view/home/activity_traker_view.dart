@@ -1,8 +1,10 @@
 import 'package:fitrack/common/color_extension.dart';
 import 'package:fitrack/common_widget/round_button.dart';
-import 'package:fitrack/view/home/calories_view.dart';
 import 'package:flutter/material.dart';
-
+import 'package:fitrack/view/activity_section/calories_view.dart';
+import 'package:fitrack/view/activity_section/steps_view.dart';
+import 'package:fitrack/view/activity_section/sleep_view.dart';
+import 'package:fitrack/view/activity_section/water_view.dart';
 class ActivityTrackerView extends StatefulWidget {
   const ActivityTrackerView({super.key});
 
@@ -31,7 +33,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
 
             RoundButton(title: "Log Sleep", onPressed: _logSleep),
             SizedBox(height: 20),
-            RoundButton(title: "Log Workout", onPressed: _logWorkout),
+            RoundButton(title: "Log Steps", onPressed: _logSteps),
             SizedBox(height: 20),
             RoundButton(title: "Log Water", onPressed: _logWater),
             SizedBox(height: 20),
@@ -50,18 +52,33 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
   }
 
   void _logSleep() {
+     Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const SleepView()),
+    );
     // Logic to log sleep
   }
 
-  void _logWorkout() {
-    // Logic to log workout
+  void _logSteps() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const StepsView()),
+    );
+    // Logic to log steps
   }
 
   void _logWater() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const WaterView()),
+    );
     // Logic to log water
   }
 
   void _logFood() {
-    // Logic to log food
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CaloriesView()),
+    );
   }
 }

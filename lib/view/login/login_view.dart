@@ -1,10 +1,14 @@
 import 'package:fitrack/common/color_extension.dart';
 import 'package:fitrack/common_widget/round_button.dart';
 import 'package:fitrack/common_widget/round_textfiled.dart';
+// ignore_for_file: unused_import
+import 'package:fitrack/view/home/home_view.dart';
 import 'package:fitrack/view/login/complete_profile_view.dart';
 import 'package:fitrack/view/login/forgot_pass.dart';
 import 'package:flutter/material.dart';
 import 'package:fitrack/view/main_tab/maintab_view.dart';
+import 'package:fitrack/view/login/welcome_view.dart';
+import 'package:fitrack/view/admin_home/admin_dashboard.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});

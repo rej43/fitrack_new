@@ -5,7 +5,7 @@ import 'package:fitrack/common_widget/round_button.dart';
 import 'package:fitrack/view/login/goal_view.dart';
 
 class BodyTypeSelectionPage extends StatefulWidget {
-  const BodyTypeSelectionPage({Key? key}) : super(key: key);
+  const BodyTypeSelectionPage({super.key});
 
   @override
   _BodyTypeSelectionPageState createState() => _BodyTypeSelectionPageState();

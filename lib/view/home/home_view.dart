@@ -2,6 +2,7 @@ import 'package:dotted_dashed_line/dotted_dashed_line.dart';
 import 'package:fitrack/common/color_extension.dart';
 import 'package:fitrack/common_widget/round_button.dart';
 import 'package:fitrack/view/home/Set_goals.dart';
+// ignore_for_file: unused_import
 import 'package:fitrack/view/home/activity_traker_view.dart';
 import 'package:fitrack/view/home/view_more.dart';
 import 'package:simple_animation_progress_bar/simple_animation_progress_bar.dart';
@@ -119,12 +120,12 @@ class _HomeViewState extends State<HomeView> {
                               fontSize: 12,
                               fontWeight: FontWeight.w100,
                               onPressed: () {
-                                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const BMIDetailPage(),
-                    ),
-                );
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const BMIDetailPage(),
+                                  ),
+                                );
                               },
                             ),
                           ),

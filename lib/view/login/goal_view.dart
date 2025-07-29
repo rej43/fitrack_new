@@ -19,34 +19,16 @@ class _GoalViewState extends State<GoalView> {
 
   List goalArr = [
     {
-      "image": "assets/img/goal_1.png",
-      "title": "Improve Shape",
-      "subtitle":
-          "I have a low amount of body fat\nand need / want to build more\nmuscle",
-    },
-    {
       "image": "assets/img/goal_2.png",
       "title": "Lose Fat",
       "subtitle":
           "I have over 20 lbs to lose. I want to\ndrop all this fat and gain muscle\nmass",
     },
     {
-      "image": "assets/img/goal_3.png",
-      "title": "Better Sleep",
-      "subtitle":
-          "I want to improve my sleep quality\nand maintain a healthy sleep\nschedule for better recovery.",
-    },
-    {
       "image": "assets/img/goal_4.jpg",
       "title": "Bulking Up",
       "subtitle":
           "I want to gain significant muscle\nmass and increase my overall\nstrength.",
-    },
-    {
-      "image": "assets/img/goal_5.jpg",
-      "title": "Stay Healthy",
-      "subtitle":
-          "I want to maintain my current fitness\nlevel, improve overall well-being, and\nlive a healthy lifestyle.",
     },
     {
       "image": "assets/img/goal_6.jpg",

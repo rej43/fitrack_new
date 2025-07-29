@@ -1,10 +1,10 @@
 import 'package:fitrack/common/color_extension.dart';
-import 'package:fitrack/common_widget/round_button.dart';
 import 'package:flutter/material.dart';
 import 'package:fitrack/view/activity_section/calories_view.dart';
 import 'package:fitrack/view/activity_section/steps_view.dart';
 import 'package:fitrack/view/activity_section/sleep_view.dart';
 import 'package:fitrack/view/activity_section/water_view.dart';
+
 class ActivityTrackerView extends StatefulWidget {
   const ActivityTrackerView({super.key});
 
@@ -17,46 +17,103 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Activity Tracker',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
+        elevation: 1,
         backgroundColor: TColor.primaryColor1,
+        centerTitle: true,
+        title: const Text(
+          'Activity Tracker',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+            fontSize: 20,
+            letterSpacing: 1.1,
+          ),
+        ),
       ),
+      backgroundColor: Colors.white,
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildHeader(),
-            SizedBox(height: 20),
-
-            RoundButton(title: "Log Sleep", onPressed: _logSleep),
-            SizedBox(height: 20),
-            RoundButton(title: "Log Steps", onPressed: _logSteps),
-            SizedBox(height: 20),
-            RoundButton(title: "Log Water", onPressed: _logWater),
-            SizedBox(height: 20),
-            RoundButton(title: "Log Food", onPressed: _logFood),
+            const Padding(
+              padding: EdgeInsets.only(bottom: 18),
+              child: Text(
+                "Track your daily activities",
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+            _activityCard(
+              icon: Icons.nightlight_round,
+              label: "Log Sleep",
+              iconColor: Colors.deepPurple,
+              onTap: _logSleep,
+            ),
+            _activityCard(
+              icon: Icons.directions_walk,
+              label: "Log Steps",
+              iconColor: Colors.green,
+              onTap: _logSteps,
+            ),
+            _activityCard(
+              icon: Icons.opacity,
+              label: "Log Water",
+              iconColor: Colors.blue,
+              onTap: _logWater,
+            ),
+            _activityCard(
+              icon: Icons.local_fire_department,
+              label: "Log Food",
+              iconColor: Colors.deepOrange,
+              onTap: _logFood,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
-    return Text(
-      'Track your daily activities',
-      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  Widget _activityCard({
+    required IconData icon,
+    required String label,
+    required Color iconColor,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      child: Card(
+        elevation: 0,
+        color: TColor.lightgrey,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: ListTile(
+          leading: CircleAvatar(
+            backgroundColor: Colors.white,
+            child: Icon(icon, color: iconColor),
+          ),
+          title: Text(
+            label,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+              color: Colors.black87,
+            ),
+          ),
+          trailing: const Icon(Icons.chevron_right, color: Colors.black38),
+          onTap: onTap,
+        ),
+      ),
     );
   }
 
   void _logSleep() {
-     Navigator.push(
+    Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const SleepView()),
     );
-    // Logic to log sleep
   }
 
   void _logSteps() {
@@ -64,7 +121,6 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
       context,
       MaterialPageRoute(builder: (context) => const StepsView()),
     );
-    // Logic to log steps
   }
 
   void _logWater() {
@@ -72,7 +128,6 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
       context,
       MaterialPageRoute(builder: (context) => const WaterView()),
     );
-    // Logic to log water
   }
 
   void _logFood() {

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 import 'package:fitrack/common/color_extension.dart';
+// ignore_for_file: unused_import
 import 'dart:async';
 
 class SleepView extends StatefulWidget {
-  const SleepView({Key? key}) : super(key: key);
+  const SleepView({super.key});
 
   @override
   State<SleepView> createState() => _SleepViewState();

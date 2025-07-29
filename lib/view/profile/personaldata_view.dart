@@ -15,7 +15,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
   String? sugar;
   String? bp;
   String? notes;
-
+  // ignore_for_file: unused_import
   final FocusNode _focusNode = FocusNode();
 
   void _saveData() {

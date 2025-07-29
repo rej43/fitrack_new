@@ -10,8 +10,7 @@ class BodyTypeSelector extends StatefulWidget {
   final ValueChanged<BodyType?>? onChanged;
   final BodyType? initialValue;
 
-  const BodyTypeSelector({Key? key, this.onChanged, this.initialValue})
-    : super(key: key);
+  const BodyTypeSelector({super.key, this.onChanged, this.initialValue});
 
   @override
   _BodyTypeSelectorState createState() => _BodyTypeSelectorState();

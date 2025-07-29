@@ -6,16 +6,37 @@ import 'package:fitrack/view/profile/profile_view.dart';
 import 'package:flutter/material.dart';
 
 class MainTabView extends StatefulWidget {
-  const MainTabView({super.key});
+  final int initialTab;
+  const MainTabView({super.key, this.initialTab = 0});
 
   @override
   State<MainTabView> createState() => _MainTabViewState();
 }
 
 class _MainTabViewState extends State<MainTabView> {
-  int selectTab = 0;
+  late int selectTab;
   final PageStorageBucket pageBucket = PageStorageBucket();
-  Widget currentTab = const HomeView();
+  late Widget currentTab;
+
+  @override
+  void initState() {
+    super.initState();
+    selectTab = widget.initialTab;
+    currentTab = _getTabWidget(selectTab);
+  }
+
+  Widget _getTabWidget(int tabIndex) {
+    switch (tabIndex) {
+      case 0:
+        return const HomeView();
+      case 1:
+        return const ActivityTrackerView();
+      case 3:
+        return const ProfileView();
+      default:
+        return const HomeView();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +68,7 @@ class _MainTabViewState extends State<MainTabView> {
                   onTap: () {
                     setState(() {
                       selectTab = 0;
-                      currentTab = const HomeView();
+                      currentTab = _getTabWidget(0);
                     });
                   },
                 ),
@@ -58,7 +79,7 @@ class _MainTabViewState extends State<MainTabView> {
                   onTap: () {
                     setState(() {
                       selectTab = 1;
-                      currentTab = const ActivityTrackerView();
+                      currentTab = _getTabWidget(1);
                     });
                   },
                 ),
@@ -69,7 +90,7 @@ class _MainTabViewState extends State<MainTabView> {
                   onTap: () {
                     setState(() {
                       selectTab = 2;
-                      currentTab = const HomeView(); // placeholder
+                      currentTab = _getTabWidget(2);
                     });
                   },
                 ),
@@ -80,10 +101,7 @@ class _MainTabViewState extends State<MainTabView> {
                   onTap: () {
                     setState(() {
                       selectTab = 3;
-                      currentTab = const ProfileView();
-                      if (mounted) {
-                        setState(() {});
-                      }
+                      currentTab = _getTabWidget(3);
                     });
                   },
                 ),

@@ -263,11 +263,13 @@ class _AdminDashboardState extends State<AdminDashboard>
                                           24,
                                           29,
                                         ];
-                                        if (!showIdx.contains(idx))
+                                        if (!showIdx.contains(idx)) {
                                           return const SizedBox.shrink();
+                                        }
                                       }
-                                      if (idx < 0 || idx >= _xLabels.length)
+                                      if (idx < 0 || idx >= _xLabels.length) {
                                         return const SizedBox.shrink();
+                                      }
                                       return Padding(
                                         padding: const EdgeInsets.only(
                                           top: 8.0,

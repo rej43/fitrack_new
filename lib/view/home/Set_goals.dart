@@ -2,7 +2,7 @@ import 'package:fitrack/common/color_extension.dart';
 import 'package:flutter/material.dart';
 
 class SetGoalsView extends StatefulWidget {
-  const SetGoalsView({Key? key}) : super(key: key);
+  const SetGoalsView({super.key});
 
   @override
   _SetGoalsScreenState createState() => _SetGoalsScreenState();

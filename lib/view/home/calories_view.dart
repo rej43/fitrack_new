@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class NutritionPage extends StatefulWidget {
+  const NutritionPage({super.key});
+
   @override
   _NutritionPageState createState() => _NutritionPageState();
 }

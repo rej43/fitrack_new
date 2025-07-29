@@ -1,20 +1,33 @@
 PODS:
   - Flutter (1.0.0)
+  - pedometer (0.0.1):
+    - Flutter
+  - shared_preferences_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
   - simple_animation_progress_bar (0.0.1):
     - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - pedometer (from `.symlinks/plugins/pedometer/ios`)
+  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - simple_animation_progress_bar (from `.symlinks/plugins/simple_animation_progress_bar/ios`)
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  pedometer:
+    :path: ".symlinks/plugins/pedometer/ios"
+  shared_preferences_foundation:
+    :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   simple_animation_progress_bar:
     :path: ".symlinks/plugins/simple_animation_progress_bar/ios"
 
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  pedometer: 1c5eaab0c6bce8eb7651f7095553b5081c9d06ed
+  shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
   simple_animation_progress_bar: 0b019e3df62134522606ec053327ac67fb4cd274
 
 PODFILE CHECKSUM: 4305caec6b40dde0ae97be1573c53de1882a07e5

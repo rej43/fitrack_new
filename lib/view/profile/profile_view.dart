@@ -4,6 +4,8 @@ import 'package:fitrack/common_widget/setting_row.dart';
 import 'package:fitrack/common_widget/title_subtitle_cell.dart';
 import 'package:fitrack/view/profile/personaldata_view.dart';
 import 'package:flutter/material.dart';
+//ignore_for_file: unused_import
+import 'package:fitrack/common_widget/round_button.dart';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:fitrack/view/on_boarding/started_view.dart';

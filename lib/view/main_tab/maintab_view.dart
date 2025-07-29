@@ -4,6 +4,7 @@ import 'package:fitrack/view/home/activity_traker_view.dart';
 import 'package:fitrack/view/home/home_view.dart';
 import 'package:fitrack/view/profile/profile_view.dart';
 import 'package:flutter/material.dart';
+import 'package:fitrack/view/community/community_view.dart';
 
 class MainTabView extends StatefulWidget {
   final int initialTab;
@@ -90,7 +91,7 @@ class _MainTabViewState extends State<MainTabView> {
                   onTap: () {
                     setState(() {
                       selectTab = 2;
-                      currentTab = _getTabWidget(2);
+                      currentTab = const CommunityView();
                     });
                   },
                 ),

@@ -9,7 +9,10 @@ class CommunityView extends StatefulWidget {
 }
 
 class _CommunityViewState extends State<CommunityView> {
-  // Sample data with comments
+  // Simulate current user (replace with your auth/user logic)
+  final String currentUserName = 'Alice';
+
+  // Sample data with comments and likedBy
   final List<Map<String, dynamic>> posts = [
     {
       'user': 'Alice',
@@ -17,6 +20,7 @@ class _CommunityViewState extends State<CommunityView> {
       'activity': 'Ran 5 km in 28:15',
       'time': '10 min ago',
       'likes': 12,
+      'likedBy': <String>{'Alice'},
       'comments': ['Great job!', 'Impressive pace!', 'Keep it up!'],
     },
     {
@@ -25,6 +29,7 @@ class _CommunityViewState extends State<CommunityView> {
       'activity': 'Drank 2L water 💧',
       'time': '30 min ago',
       'likes': 7,
+      'likedBy': <String>{},
       'comments': ['Hydration is key!'],
     },
     {
@@ -33,6 +38,7 @@ class _CommunityViewState extends State<CommunityView> {
       'activity': 'Burned 500 kcal cycling 🚴',
       'time': '1 hr ago',
       'likes': 15,
+      'likedBy': <String>{},
       'comments': [
         'Wow, amazing!',
         'How long did it take?',
@@ -43,9 +49,14 @@ class _CommunityViewState extends State<CommunityView> {
   ];
 
   void _incrementLike(int index) {
-    setState(() {
-      posts[index]['likes'] += 1;
-    });
+    final likedBy = (posts[index]['likedBy'] ?? <String>{}) as Set<String>;
+    if (!likedBy.contains(currentUserName)) {
+      setState(() {
+        posts[index]['likes'] += 1;
+        likedBy.add(currentUserName);
+        posts[index]['likedBy'] = likedBy; // Ensure it's set back
+      });
+    }
   }
 
   void _showComments(int index) {
@@ -123,6 +134,50 @@ class _CommunityViewState extends State<CommunityView> {
     );
   }
 
+  void _showAddPostDialog() {
+    final TextEditingController postController = TextEditingController();
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('New Post'),
+            content: TextField(
+              controller: postController,
+              decoration: const InputDecoration(
+                hintText: 'What do you want to share?',
+              ),
+              autofocus: true,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  final text = postController.text.trim();
+                  if (text.isNotEmpty) {
+                    setState(() {
+                      posts.insert(0, {
+                        'user': currentUserName,
+                        'avatar': null,
+                        'activity': text,
+                        'time': 'Just now',
+                        'likes': 0,
+                        'likedBy': <String>{currentUserName},
+                        'comments': [],
+                      });
+                    });
+                    Navigator.pop(context);
+                  }
+                },
+                child: const Text('Post'),
+              ),
+            ],
+          ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -139,6 +194,7 @@ class _CommunityViewState extends State<CommunityView> {
             letterSpacing: 1.1,
           ),
         ),
+        // Removed actions to eliminate the top right three-dot menu
       ),
       backgroundColor: Colors.white,
       body: ListView.separated(
@@ -147,6 +203,8 @@ class _CommunityViewState extends State<CommunityView> {
         separatorBuilder: (_, __) => const SizedBox(height: 16),
         itemBuilder: (context, index) {
           final post = posts[index];
+          final likedBy = (post['likedBy'] ?? <String>{}) as Set<String>;
+          final isLiked = likedBy.contains(currentUserName);
           return Card(
             elevation: 0,
             color: TColor.lightgrey,
@@ -212,9 +270,14 @@ class _CommunityViewState extends State<CommunityView> {
                               child: Row(
                                 children: [
                                   Icon(
-                                    Icons.thumb_up_alt_outlined,
+                                    isLiked
+                                        ? Icons.thumb_up_alt
+                                        : Icons.thumb_up_alt_outlined,
                                     size: 16,
-                                    color: Colors.grey.shade600,
+                                    color:
+                                        isLiked
+                                            ? TColor.primaryColor1
+                                            : Colors.grey.shade600,
                                   ),
                                   const SizedBox(width: 4),
                                   Text('${post['likes']}'),
@@ -247,6 +310,12 @@ class _CommunityViewState extends State<CommunityView> {
             ),
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showAddPostDialog,
+        backgroundColor: TColor.primaryColor1,
+        child: const Icon(Icons.add, color: Colors.white),
+        tooltip: 'Add Post',
       ),
     );
   }

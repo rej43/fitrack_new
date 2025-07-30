@@ -42,6 +42,7 @@ class _MainTabViewState extends State<MainTabView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false, // Added to prevent bottom overflow
       backgroundColor: TColor.white,
       body: PageStorage(bucket: pageBucket, child: currentTab),
       bottomNavigationBar: Container(
@@ -55,59 +56,57 @@ class _MainTabViewState extends State<MainTabView> {
             ),
           ],
         ),
-        child: SafeArea(
-          // safe area for bottom notch
-          child: SizedBox(
-            height: 80,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                TabButton(
-                  icon: "assets/img/home.png",
-                  label: 'Home',
-                  isActive: selectTab == 0,
-                  onTap: () {
-                    setState(() {
-                      selectTab = 0;
-                      currentTab = _getTabWidget(0);
-                    });
-                  },
-                ),
-                TabButton(
-                  icon: "assets/img/activity.png",
-                  label: 'Activity',
-                  isActive: selectTab == 1,
-                  onTap: () {
-                    setState(() {
-                      selectTab = 1;
-                      currentTab = _getTabWidget(1);
-                    });
-                  },
-                ),
-                TabButton(
-                  icon: "assets/img/united.png",
-                  label: 'Community',
-                  isActive: selectTab == 2,
-                  onTap: () {
-                    setState(() {
-                      selectTab = 2;
-                      currentTab = const CommunityView();
-                    });
-                  },
-                ),
-                TabButton(
-                  icon: "assets/img/user.png",
-                  label: 'Profile',
-                  isActive: selectTab == 3,
-                  onTap: () {
-                    setState(() {
-                      selectTab = 3;
-                      currentTab = _getTabWidget(3);
-                    });
-                  },
-                ),
-              ],
-            ),
+        // Removed SafeArea to fix bottom overflow
+        child: SizedBox(
+          height: 60, // Reduced height from 80 to 60 to fix bottom overflow
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              TabButton(
+                icon: "assets/img/home.png",
+                label: 'Home',
+                isActive: selectTab == 0,
+                onTap: () {
+                  setState(() {
+                    selectTab = 0;
+                    currentTab = _getTabWidget(0);
+                  });
+                },
+              ),
+              TabButton(
+                icon: "assets/img/activity.png",
+                label: 'Activity',
+                isActive: selectTab == 1,
+                onTap: () {
+                  setState(() {
+                    selectTab = 1;
+                    currentTab = _getTabWidget(1);
+                  });
+                },
+              ),
+              TabButton(
+                icon: "assets/img/united.png",
+                label: 'Comunity',
+                isActive: selectTab == 2,
+                onTap: () {
+                  setState(() {
+                    selectTab = 2;
+                    currentTab = const CommunityView();
+                  });
+                },
+              ),
+              TabButton(
+                icon: "assets/img/user.png",
+                label: 'Profile',
+                isActive: selectTab == 3,
+                onTap: () {
+                  setState(() {
+                    selectTab = 3;
+                    currentTab = _getTabWidget(3);
+                  });
+                },
+              ),
+            ],
           ),
         ),
       ),

@@ -55,7 +55,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
             ),
             _activityCard(
               icon: Icons.directions_walk,
-              label: "Log Steps",
+              label: "Track Steps",
               iconColor: Colors.green,
               onTap: _logSteps,
             ),
@@ -119,7 +119,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
   void _logSteps() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const StepsView()),
+      MaterialPageRoute(builder: (context) => const StepTrackerPage()),
     );
   }
 

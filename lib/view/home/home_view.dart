@@ -32,6 +32,7 @@ class _HomeViewState extends State<HomeView> {
     return Scaffold(
       backgroundColor: TColor.white,
       body: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 60),  // Added bottom padding to avoid content blocked by navbar
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -545,7 +546,8 @@ class _HomeViewState extends State<HomeView> {
                     ),
                   ],
                 ),
-                SizedBox(height: media.width * 0.1),
+                // Removed bottom SizedBox to fix bottom overflow
+                // Removed bottom SizedBox to fix bottom overflow
               ],
             ),
           ),

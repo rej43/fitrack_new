@@ -1,139 +1,124 @@
-import 'package:fitrack/common/color_extension.dart';
 import 'package:flutter/material.dart';
-import 'package:fitrack/view/activity_section/calories_view.dart';
-import 'package:fitrack/view/activity_section/steps_view.dart' as steps;
-import 'package:fitrack/view/activity_section/sleep_view.dart';
-import 'package:fitrack/view/activity_section/water_view.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:pedometer/pedometer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
-class StepsView extends StatefulWidget {
-  const StepsView({super.key});
+class StepTrackerPage extends StatefulWidget {
+  const StepTrackerPage({super.key});
 
   @override
-  State<StepsView> createState() => _StepsViewState();
+  State<StepTrackerPage> createState() => _StepTrackerPageState();
 }
 
-class _StepsViewState extends State<StepsView> {
+class _StepTrackerPageState extends State<StepTrackerPage> {
+  late Stream<StepCount> _stepCountStream;
+  int _initialSteps = 0;
+  int _currentSteps = 0;
+  String _status = 'Initializing...';
+  int _latestRawSteps = 0;
+
+  String get _today => DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+  @override
+  void initState() {
+    super.initState();
+    _requestPermissionAndStart();
+  }
+
+  Future<void> _requestPermissionAndStart() async {
+    final permissionStatus = await Permission.activityRecognition.request();
+
+    if (permissionStatus.isGranted) {
+      await _loadSavedData();
+      _startStepTracking();
+    } else {
+      setState(() {
+        _status = 'Permission Denied';
+      });
+    }
+  }
+
+  Future<void> _loadSavedData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedDate = prefs.getString('step_date') ?? _today;
+
+    if (savedDate == _today) {
+      _initialSteps = prefs.getInt('initial_steps') ?? 0;
+    } else {
+      _initialSteps = 0;
+      await prefs.setString('step_date', _today);
+      await prefs.setInt('initial_steps', 0);
+    }
+  }
+
+  Future<void> _saveInitialStep(int steps) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('initial_steps', steps);
+    await prefs.setString('step_date', _today);
+  }
+
+  void _startStepTracking() {
+    _stepCountStream = Pedometer.stepCountStream;
+    _stepCountStream.listen(
+      (StepCount event) {
+        setState(() {
+          _latestRawSteps = event.steps;
+          if (_initialSteps == 0) {
+            _initialSteps = event.steps;
+            _saveInitialStep(_initialSteps);
+          }
+          _currentSteps = event.steps - _initialSteps;
+          _status = 'Tracking steps...';
+        });
+      },
+      onError: (error) {
+        setState(() {
+          _status = 'Step Count Error: $error';
+        });
+      },
+    );
+  }
+
+  Future<void> _resetSteps() async {
+    _initialSteps = _latestRawSteps;
+    await _saveInitialStep(_initialSteps);
+    setState(() {
+      _currentSteps = 0;
+      _status = 'Reset successful';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 1,
-        backgroundColor: TColor.primaryColor1,
-        centerTitle: true,
-        title: const Text(
-          'Steps',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-            fontSize: 20,
-            letterSpacing: 1.1,
-          ),
-        ),
-      ),
-      backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+      appBar: AppBar(title: const Text("Step Tracker")),
+      body: Center(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Padding(
-              padding: EdgeInsets.only(bottom: 18),
-              child: Text(
-                "Track your daily activities",
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                  color: Colors.black87,
+            const Icon(Icons.directions_walk, size: 100, color: Colors.green),
+            const SizedBox(height: 20),
+            Text('Steps: $_currentSteps', style: const TextStyle(fontSize: 32)),
+            const SizedBox(height: 10),
+            Text(_status),
+            const SizedBox(height: 30),
+            ElevatedButton.icon(
+              onPressed: _resetSteps,
+              icon: const Icon(Icons.refresh),
+              label: const Text("Reset Counter"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
                 ),
               ),
-            ),
-            _activityCard(
-              icon: Icons.nightlight_round,
-              label: "Log Sleep",
-              iconColor: Colors.deepPurple,
-              onTap: _logSleep,
-            ),
-            _activityCard(
-              icon: Icons.directions_walk,
-              label: "Log Steps",
-              iconColor: Colors.green,
-              onTap: _logSteps,
-            ),
-            _activityCard(
-              icon: Icons.opacity,
-              label: "Log Water",
-              iconColor: Colors.blue,
-              onTap: _logWater,
-            ),
-            _activityCard(
-              icon: Icons.local_fire_department,
-              label: "Log Food",
-              iconColor: Colors.deepOrange,
-              onTap: _logFood,
             ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _activityCard({
-    required IconData icon,
-    required String label,
-    required Color iconColor,
-    required VoidCallback onTap,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      child: Card(
-        elevation: 0,
-        color: TColor.lightgrey,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: ListTile(
-          leading: CircleAvatar(
-            backgroundColor: Colors.white,
-            child: Icon(icon, color: iconColor),
-          ),
-          title: Text(
-            label,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 16,
-              color: Colors.black87,
-            ),
-          ),
-          trailing: const Icon(Icons.chevron_right, color: Colors.black38),
-          onTap: onTap,
-        ),
-      ),
-    );
-  }
-
-  void _logSleep() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const SleepView()),
-    );
-  }
-
-  void _logSteps() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const steps.StepsView()),
-    );
-  }
-
-  void _logWater() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const WaterView()),
-    );
-  }
-
-  void _logFood() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const CaloriesView()),
     );
   }
 }

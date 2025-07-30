@@ -2,6 +2,7 @@ import 'package:fitrack/common/color_extension.dart';
 
 import 'package:fitrack/common_widget/setting_row.dart';
 import 'package:fitrack/common_widget/title_subtitle_cell.dart';
+import 'package:fitrack/common_widget/editable_title_subtitle_cell.dart';
 import 'package:fitrack/view/profile/personaldata_view.dart';
 import 'package:flutter/material.dart';
 //ignore_for_file: unused_import
@@ -20,6 +21,10 @@ class ProfileView extends StatefulWidget {
 class _ProfileViewState extends State<ProfileView> {
   bool positive = false;
 
+  String height = "180cm";
+  String weight = "65kg";
+  final String age = "22yo";
+
   List accountArr = [
     {"image": "assets/img/user.png", "name": "Personal Data", "tag": "1"},
   ];
@@ -29,6 +34,60 @@ class _ProfileViewState extends State<ProfileView> {
     {"image": "assets/img/privacy.png", "name": "Privacy Policy", "tag": "6"},
     {"image": "assets/img/setting.png", "name": "Logout", "tag": "7"},
   ];
+
+  Future<void> _editValueDialog({
+    required String title,
+    required String initialValue,
+    required String unit,
+    required ValueChanged<String> onChanged,
+  }) async {
+    final controller = TextEditingController(
+      text: initialValue.replaceAll(unit, ''),
+    );
+    String? errorText;
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              title: Text('Edit $title'),
+              content: TextField(
+                controller: controller,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  suffixText: unit,
+                  errorText: errorText,
+                ),
+                autofocus: true,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    final value = controller.text.trim();
+                    if (value.isEmpty || double.tryParse(value) == null) {
+                      setStateDialog(() {
+                        errorText = 'Please enter a valid number';
+                      });
+                      return;
+                    }
+                    onChanged('$value$unit');
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Save'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,27 +104,7 @@ class _ProfileViewState extends State<ProfileView> {
             fontWeight: FontWeight.w700,
           ),
         ),
-        actions: [
-          InkWell(
-            onTap: () {},
-            child: Container(
-              margin: const EdgeInsets.all(8),
-              height: 40,
-              width: 40,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: TColor.lightgrey,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Image.asset(
-                "assets/img/more.png",
-                width: 15,
-                height: 15,
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-        ],
+        actions: [],
       ),
       backgroundColor: TColor.white,
       body: SingleChildScrollView(
@@ -104,21 +143,40 @@ class _ProfileViewState extends State<ProfileView> {
                 ],
               ),
               const SizedBox(height: 15),
-              const Row(
+              Row(
                 children: [
                   Expanded(
-                    child: TitleSubtitleCell(
-                      title: "180cm",
+                    child: EditableTitleSubtitleCell(
+                      title: height,
                       subtitle: "Height",
+                      onTap: () async {
+                        await _editValueDialog(
+                          title: "Height",
+                          initialValue: height,
+                          unit: "cm",
+                          onChanged: (val) => setState(() => height = val),
+                        );
+                      },
                     ),
                   ),
-                  SizedBox(width: 15),
+                  const SizedBox(width: 15),
                   Expanded(
-                    child: TitleSubtitleCell(title: "65kg", subtitle: "Weight"),
+                    child: EditableTitleSubtitleCell(
+                      title: weight,
+                      subtitle: "Weight",
+                      onTap: () async {
+                        await _editValueDialog(
+                          title: "Weight",
+                          initialValue: weight,
+                          unit: "kg",
+                          onChanged: (val) => setState(() => weight = val),
+                        );
+                      },
+                    ),
                   ),
-                  SizedBox(width: 15),
+                  const SizedBox(width: 15),
                   Expanded(
-                    child: TitleSubtitleCell(title: "22yo", subtitle: "Age"),
+                    child: TitleSubtitleCell(title: age, subtitle: "Age"),
                   ),
                 ],
               ),
@@ -325,7 +383,7 @@ class _ProfileViewState extends State<ProfileView> {
                                     (context) => AlertDialog(
                                       title: const Text('Contact Us'),
                                       content: const Text(
-                                        'Email: support@fitrackapp.com\nPhone: +1 234 567 8901\nAddress: 123 Fit St, Wellness City',
+                                        'Email: support@fitrackapp.com\nPhone: +977 9886649109',
                                       ),
                                       actions: [
                                         TextButton(

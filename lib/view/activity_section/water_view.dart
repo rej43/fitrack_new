@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fitrack/common/color_extension.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:fitrack/view/main_tab/maintab_view.dart';
+
+import 'package:fitrack/view/home/activity_traker_view.dart';
 
 class WaterView extends StatefulWidget {
   const WaterView({super.key});
@@ -100,9 +101,7 @@ class _WaterViewState extends State<WaterView> {
       onWillPop: () async {
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(
-            builder: (context) => const MainTabView(initialTab: 0),
-          ),
+          MaterialPageRoute(builder: (context) => const ActivityTrackerView()),
           (route) => false,
         );
         return false;
@@ -121,7 +120,7 @@ class _WaterViewState extends State<WaterView> {
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const MainTabView(initialTab: 0),
+                  builder: (context) => const ActivityTrackerView(),
                 ),
                 (route) => false,
               );

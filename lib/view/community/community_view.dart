@@ -346,8 +346,8 @@ class _CommunityViewState extends State<CommunityView> {
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddPostDialog,
         backgroundColor: TColor.primaryColor1,
-        child: const Icon(Icons.add, color: Colors.white),
         tooltip: 'Add Post',
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }

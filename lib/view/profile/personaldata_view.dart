@@ -4,7 +4,7 @@ import 'package:fitrack/common/color_extension.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PersonalDataScreen extends StatefulWidget {
-  const PersonalDataScreen({Key? key}) : super(key: key);
+  const PersonalDataScreen({super.key});
 
   @override
   State<PersonalDataScreen> createState() => _PersonalDataScreenState();
@@ -19,7 +19,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
   // ignore_for_file: unused_import
   final FocusNode _focusNode = FocusNode();
   bool isLoading = true;
-  
+
   // Add controllers for proper data persistence
   late TextEditingController disabilityController;
   late TextEditingController sugarController;
@@ -55,13 +55,13 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
         sugar = prefs.getString('personal_sugar') ?? '';
         bp = prefs.getString('personal_bp') ?? '';
         notes = prefs.getString('personal_notes') ?? '';
-        
+
         // Set controller values
         disabilityController.text = disability ?? '';
         sugarController.text = sugar ?? '';
         bpController.text = bp ?? '';
         notesController.text = notes ?? '';
-        
+
         isLoading = false;
       });
     } catch (e) {
@@ -75,21 +75,21 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       FocusScope.of(context).unfocus();
-      
+
       try {
         // Get values from controllers
         final disabilityValue = disabilityController.text;
         final sugarValue = sugarController.text;
         final bpValue = bpController.text;
         final notesValue = notesController.text;
-        
+
         // Save personal data to SharedPreferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('personal_disability', disabilityValue);
         await prefs.setString('personal_sugar', sugarValue);
         await prefs.setString('personal_bp', bpValue);
         await prefs.setString('personal_notes', notesValue);
-        
+
         // Update local variables
         setState(() {
           disability = disabilityValue;
@@ -97,7 +97,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
           bp = bpValue;
           notes = notesValue;
         });
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Personal data saved successfully!'),
@@ -144,7 +144,10 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              _buildTextFieldWithController('Disability (if any)', disabilityController),
+              _buildTextFieldWithController(
+                'Disability (if any)',
+                disabilityController,
+              ),
               const SizedBox(height: 12),
               _buildTextFieldWithController('Sugar Level', sugarController),
               const SizedBox(height: 12),
@@ -160,7 +163,10 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
     );
   }
 
-  Widget _buildTextFieldWithController(String label, TextEditingController controller) {
+  Widget _buildTextFieldWithController(
+    String label,
+    TextEditingController controller,
+  ) {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(

@@ -130,10 +130,31 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
     );
   }
 
-  void _logFood() {
-    Navigator.push(
+  void _logFood() async {
+    await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const CaloriesView()),
+      MaterialPageRoute(
+        builder: (context) => CaloriesView(
+          onCaloriesUpdated: () async {
+            // Refresh home screen when calories are updated
+            if (mounted) {
+              // Force refresh of calorie data in home view
+              await _refreshHomeViewCalories();
+              setState(() {});
+            }
+          },
+        ),
+      ),
     );
+    // Refresh data when returning from calories view
+    if (mounted) {
+      // Force rebuild to refresh calorie data
+      setState(() {});
+    }
+  }
+
+  Future<void> _refreshHomeViewCalories() async {
+    // This method will be overridden by the home view
+    // to refresh calorie data
   }
 }

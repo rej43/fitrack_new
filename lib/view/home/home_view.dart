@@ -10,6 +10,9 @@ import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 import 'package:fitrack/view/home/notification_view.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:fitrack/models/user_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -19,6 +22,9 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  UserModel? user;
+  bool isLoading = true;
+
   List waterArr = [
     {"title": "6am - 8am", "subtitle": "600ml"},
     {"title": "9am - 11am", "subtitle": "500ml"},
@@ -26,13 +32,71 @@ class _HomeViewState extends State<HomeView> {
     {"title": "2pm - 4pm", "subtitle": "700ml"},
     {"title": "4pm - now", "subtitle": "900ml"},
   ];
+@override
+void initState() {
+  super.initState();
+  _loadUserData();     // Call to load user data
+  _loadSleepData();    // Additional load when home view initializes
+}
+
+@override
+void didChangeDependencies() {
+  super.didChangeDependencies();
+  // Reload user data when dependencies change (like when returning from profile)
+  _loadUserData();
+}
+
+Future<void> _loadSleepData() async {
+  // This will trigger a rebuild with sleep data
+  setState(() {});
+}
+
+Future<void> _loadUserData() async {
+  try {
+    final userData = await UserModel.loadFromLocal();
+    setState(() {
+      user = userData;
+      isLoading = false;
+    });
+  } catch (e) {
+    setState(() {
+      isLoading = false;
+    });
+  }
+}
+
+  Future<String> _getSleepDuration() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final savedDate = prefs.getString('sleep_date') ?? today;
+      
+      if (savedDate == today) {
+        final sleepStartString = prefs.getString('sleep_start');
+        final sleepEndString = prefs.getString('sleep_end');
+        
+        if (sleepStartString != null && sleepEndString != null) {
+          final sleepStart = DateTime.parse(sleepStartString);
+          final sleepEnd = DateTime.parse(sleepEndString);
+          final duration = sleepEnd.difference(sleepStart);
+          
+          int hours = duration.inHours;
+          int minutes = duration.inMinutes % 60;
+          return '${hours}h ${minutes}m';
+        }
+      }
+      return '8h 20m'; // Default fallback
+    } catch (e) {
+      return '8h 20m'; // Default fallback
+    }
+  }
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: TColor.white,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 60),  // Added bottom padding to avoid content blocked by navbar
+        padding: const EdgeInsets.only(bottom: 100),  // Increased bottom padding to avoid navbar overflow
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -50,7 +114,7 @@ class _HomeViewState extends State<HomeView> {
                           style: TextStyle(color: TColor.grey, fontSize: 15),
                         ),
                         Text(
-                          "Joe Goldberg",
+                          user?.name ?? "User",
                           style: TextStyle(
                             color: TColor.black,
                             fontSize: 20,
@@ -104,7 +168,7 @@ class _HomeViewState extends State<HomeView> {
                             ),
                           ),
                           Text(
-                            "You have a normal weight",
+                            user?.bmiCategory ?? "Normal Weight",
                             style: TextStyle(
                               color: TColor.grey,
                               fontWeight: FontWeight.w300,
@@ -387,9 +451,9 @@ class _HomeViewState extends State<HomeView> {
                         children: [
                           Container(
                             width: double.maxFinite,
-                            height: media.width * 0.45,
+                            height: media.width * 0.42,  // Reduced height to prevent overflow
                             padding: const EdgeInsets.symmetric(
-                              vertical: 25,
+                              vertical: 20,  // Reduced vertical padding
                               horizontal: 20,
                             ),
                             decoration: BoxDecoration(
@@ -426,19 +490,26 @@ class _HomeViewState extends State<HomeView> {
                                       ),
                                     );
                                   },
-                                  child: Text(
-                                    "8h 20m",
-                                    style: TextStyle(
-                                      color: TColor.white.withOpacity(0.7),
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 14,
-                                    ),
+                                  child: FutureBuilder<String>(
+                                    future: _getSleepDuration(),
+                                    builder: (context, snapshot) {
+                                      return Text(
+                                        snapshot.data ?? "8h 20m",
+                                        style: TextStyle(
+                                          color: TColor.white.withOpacity(0.7),
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 14,
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ),
-                                Image.asset(
-                                  "assets/img/sleep_grap.png",
-                                  width: double.maxFinite,
-                                  fit: BoxFit.fitWidth,
+                                Expanded(  // Wrap image in Expanded to prevent overflow
+                                  child: Image.asset(
+                                    "assets/img/sleep_grap.png",
+                                    width: double.maxFinite,
+                                    fit: BoxFit.fitWidth,
+                                  ),
                                 ),
                               ],
                             ),
@@ -446,9 +517,9 @@ class _HomeViewState extends State<HomeView> {
                           SizedBox(height: media.width * 0.05),
                           Container(
                             width: double.maxFinite,
-                            height: media.width * 0.45,
+                            height: media.width * 0.42,  // Reduced height to prevent overflow
                             padding: const EdgeInsets.symmetric(
-                              vertical: 25,
+                              vertical: 20,  // Reduced vertical padding
                               horizontal: 20,
                             ),
                             decoration: BoxDecoration(
@@ -557,6 +628,9 @@ class _HomeViewState extends State<HomeView> {
   }
 
   List<PieChartSectionData> showingSections() {
+    final bmi = user?.bmi ?? 19.1;
+    final bmiPercentage = (bmi / 40.0) * 100; // Assuming max BMI of 40 for visualization
+    
     return List.generate(2, (i) {
       var color0 = TColor.secondaryColor1;
 
@@ -564,12 +638,12 @@ class _HomeViewState extends State<HomeView> {
         case 0:
           return PieChartSectionData(
             color: color0,
-            value: 33,
+            value: bmiPercentage,
             title: '',
             radius: 55,
             titlePositionPercentageOffset: 0.55,
             badgeWidget: Text(
-              "19.1",
+              bmi.toStringAsFixed(1),
               style: TextStyle(
                 color: TColor.black,
                 fontSize: 12,
@@ -580,7 +654,7 @@ class _HomeViewState extends State<HomeView> {
         case 1:
           return PieChartSectionData(
             color: Colors.white,
-            value: 75,
+            value: 100 - bmiPercentage,
             title: '',
             radius: 45,
             titlePositionPercentageOffset: 0.55,

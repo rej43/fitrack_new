@@ -1,16 +1,68 @@
 import 'package:fitrack/common/color_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:fitrack/models/user_model.dart';
 
-class BMIDetailPage extends StatelessWidget {
+class BMIDetailPage extends StatefulWidget {
   const BMIDetailPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    double bmi = 19.1; // Static example BMI
+  State<BMIDetailPage> createState() => _BMIDetailPageState();
+}
 
-    String category = "Normal Weight";
+class _BMIDetailPageState extends State<BMIDetailPage> {
+  UserModel? user;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final userData = await UserModel.loadFromLocal();
+      setState(() {
+        user = userData;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: TColor.primaryColor1,
+          title: const Text("BMI Details"),
+        ),
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    final bmi = user?.bmi ?? 19.1; // Fallback to static value if no user data
+    final category = user?.bmiCategory ?? "Normal Weight";
     Color categoryColor = Colors.green;
+    
+    // Set color based on BMI category
+    if (category == "Underweight") {
+      categoryColor = Colors.blue;
+    } else if (category == "Overweight") {
+      categoryColor = Colors.orange;
+    } else if (category == "Obese") {
+      categoryColor = Colors.red;
+    }
+    
+    // Calculate BMI percentage for chart
+    final bmiPercentage = (bmi / 40.0) * 100; // Assuming max BMI of 40 for visualization
 
     return Scaffold(
       appBar: AppBar(
@@ -48,8 +100,8 @@ class BMIDetailPage extends StatelessWidget {
                 series: <DoughnutSeries<_ChartData, String>>[
                   DoughnutSeries<_ChartData, String>(
                     dataSource: [
-                      _ChartData('BMI', bmi),
-                      _ChartData('Remaining', 40 - bmi),
+                      _ChartData('BMI', bmiPercentage),
+                      _ChartData('Remaining', 100 - bmiPercentage),
                     ],
                     pointColorMapper: (_ChartData data, _) {
                       if (data.label == 'BMI') {

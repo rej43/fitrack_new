@@ -45,70 +45,68 @@ class _MainTabViewState extends State<MainTabView> {
       resizeToAvoidBottomInset: false, // Added to prevent bottom overflow
       backgroundColor: TColor.white,
       body: PageStorage(bucket: pageBucket, child: currentTab),
-      bottomNavigationBar: SafeArea(
-        top: false,
-        child: Container(
-          decoration: BoxDecoration(
-            color: TColor.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 2,
-                offset: Offset(0, -2),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: TColor.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 2,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
+        // Removed SafeArea to fix bottom overflow
+        child: SizedBox(
+          height: 70, // Increased height to prevent text overflow
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              TabButton(
+                icon: "assets/img/home.png",
+                label: 'Home',
+                isActive: selectTab == 0,
+                onTap: () {
+                  setState(() {
+                    selectTab = 0;
+                    currentTab = _getTabWidget(0);
+                  });
+                },
+              ),
+              TabButton(
+                icon: "assets/img/activity.png",
+                label: 'Activity',
+                isActive: selectTab == 1,
+                onTap: () {
+                  setState(() {
+                    selectTab = 1;
+                    currentTab = _getTabWidget(1);
+                  });
+                },
+              ),
+              TabButton(
+                icon: "assets/img/united.png",
+                label: 'Community',
+                isActive: selectTab == 2,
+                onTap: () {
+                  setState(() {
+                    selectTab = 2;
+                    currentTab = const CommunityView();
+                  });
+                },
+              ),
+              TabButton(
+                icon: "assets/img/user.png",
+                label: 'Profile',
+                isActive: selectTab == 3,
+                onTap: () {
+                  setState(() {
+                    selectTab = 3;
+                    currentTab = _getTabWidget(3);
+                  });
+                },
               ),
             ],
-          ),
-          child: SizedBox(
-            height: 60,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                TabButton(
-                  icon: "assets/img/home.png",
-                  label: 'Home',
-                  isActive: selectTab == 0,
-                  onTap: () {
-                    setState(() {
-                      selectTab = 0;
-                      currentTab = _getTabWidget(0);
-                    });
-                  },
-                ),
-                TabButton(
-                  icon: "assets/img/activity.png",
-                  label: 'Activity',
-                  isActive: selectTab == 1,
-                  onTap: () {
-                    setState(() {
-                      selectTab = 1;
-                      currentTab = _getTabWidget(1);
-                    });
-                  },
-                ),
-                TabButton(
-                  icon: "assets/img/united.png",
-                  label: 'Comunity',
-                  isActive: selectTab == 2,
-                  onTap: () {
-                    setState(() {
-                      selectTab = 2;
-                      currentTab = const CommunityView();
-                    });
-                  },
-                ),
-                TabButton(
-                  icon: "assets/img/user.png",
-                  label: 'Profile',
-                  isActive: selectTab == 3,
-                  onTap: () {
-                    setState(() {
-                      selectTab = 3;
-                      currentTab = _getTabWidget(3);
-                    });
-                  },
-                ),
-              ],
-            ),
           ),
         ),
       ),

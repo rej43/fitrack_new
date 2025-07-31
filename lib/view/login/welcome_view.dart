@@ -34,7 +34,7 @@ class _WelcomeViewState extends State<WelcomeView> {
               ),
               SizedBox(height: media.width * 0.1),
               Text(
-                "Welcome, Joe",
+                "Welcome",
                 style: TextStyle(
                   color: TColor.black,
                   fontSize: 22,

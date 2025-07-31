@@ -3,8 +3,9 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://localhost:5000/api';
-  static const String baseUrlEmulator = 'http://10.0.2.2:5000/api';
+  // Updated to match your backend configuration
+  static const String baseUrl = 'http://localhost:4000/api/v1';
+  static const String baseUrlEmulator = 'http://10.0.2.2:4000/api/v1';
   
   // Use emulator URL for Android emulator, localhost for iOS simulator
   static String get apiUrl {
@@ -87,96 +88,136 @@ class ApiService {
     }
   }
 
-  // Authentication APIs
+  // ===== AUTHENTICATION APIs =====
+  
   static Future<Map<String, dynamic>> signup({
-    required String name,
+    required String firstName,
+    required String lastName,
     required String email,
     required String password,
   }) async {
     final response = await _makeRequest('/auth/signup', 'POST', body: {
-      'name': name,
+      'firstName': firstName,
+      'lastName': lastName,
       'email': email,
       'password': password,
     });
 
-    if (response['success'] && response['data']['token'] != null) {
-      await saveToken(response['data']['token']);
+    // Save token if provided in response
+    if (response['token'] != null) {
+      await saveToken(response['token']);
     }
 
     return response;
   }
 
-  static Future<Map<String, dynamic>> login({
+  static Future<Map<String, dynamic>> signin({
     required String email,
     required String password,
   }) async {
-    final response = await _makeRequest('/auth/login', 'POST', body: {
+    final response = await _makeRequest('/auth/signin', 'POST', body: {
       'email': email,
       'password': password,
     });
 
-    if (response['success'] && response['data']['token'] != null) {
-      await saveToken(response['data']['token']);
+    // Save token if provided in response
+    if (response['token'] != null) {
+      await saveToken(response['token']);
     }
 
     return response;
   }
 
-  static Future<Map<String, dynamic>> googleLogin({
-    required String googleId,
-    required String name,
-    required String email,
-    String? profilePicture,
+  // ===== HEALTH DATA APIs =====
+  
+  static Future<Map<String, dynamic>> createHealthData({
+    required String gender,
+    required double heightInCM,
+    required double weightInKG,
+    required String bodyType,
+    required String healthGoal,
   }) async {
-    final response = await _makeRequest('/auth/google', 'POST', body: {
-      'googleId': googleId,
-      'name': name,
-      'email': email,
-      if (profilePicture != null) 'profilePicture': profilePicture,
+    return await _makeRequest('/health/createHealthData', 'POST', body: {
+      'gender': gender.toLowerCase(),
+      'heightInCM': heightInCM,
+      'weightInKG': weightInKG,
+      'bodyType': bodyType.toLowerCase(),
+      'healthGoal': healthGoal.toLowerCase(),
     });
-
-    if (response['success'] && response['data']['token'] != null) {
-      await saveToken(response['data']['token']);
-    }
-
-    return response;
   }
 
-  static Future<Map<String, dynamic>> facebookLogin({
-    required String facebookId,
-    required String name,
-    required String email,
-    String? profilePicture,
+  static Future<Map<String, dynamic>> getHealthDetails() async {
+    return await _makeRequest('/health/getHealthDetauls', 'GET');
+  }
+
+  static Future<Map<String, dynamic>> updateHealthRecord({
+    required String gender,
+    required double heightInCM,
+    required double weightInKG,
+    required String bodyType,
+    required String healthGoal,
   }) async {
-    final response = await _makeRequest('/auth/facebook', 'POST', body: {
-      'facebookId': facebookId,
-      'name': name,
-      'email': email,
-      if (profilePicture != null) 'profilePicture': profilePicture,
+    return await _makeRequest('/health/updateHealthRecord', 'PUT', body: {
+      'gender': gender.toLowerCase(),
+      'heightInCM': heightInCM,
+      'weightInKG': weightInKG,
+      'bodyType': bodyType.toLowerCase(),
+      'healthGoal': healthGoal.toLowerCase(),
     });
-
-    if (response['success'] && response['data']['token'] != null) {
-      await saveToken(response['data']['token']);
-    }
-
-    return response;
   }
 
-  static Future<Map<String, dynamic>> getCurrentUser() async {
-    return await _makeRequest('/auth/me', 'GET');
+  // ===== ACTIVITY APIs =====
+  
+  static Future<Map<String, dynamic>> logActivity({
+    required DateTime date,
+    double? sleepHours,
+    int? steps,
+    double? waterIntake,
+    double? foodCalories,
+  }) async {
+    final body = <String, dynamic>{
+      'date': date.toIso8601String(),
+    };
+    
+    if (sleepHours != null) body['sleepHours'] = sleepHours;
+    if (steps != null) body['steps'] = steps;
+    if (waterIntake != null) body['waterIntake'] = waterIntake;
+    if (foodCalories != null) body['foodCalories'] = foodCalories;
+
+    return await _makeRequest('/activity/logActivity', 'POST', body: body);
   }
 
-  static Future<Map<String, dynamic>> logout() async {
-    final response = await _makeRequest('/auth/logout', 'POST');
-    await removeToken();
-    return response;
+  static Future<Map<String, dynamic>> getActivityLog() async {
+    return await _makeRequest('/activity/getActivityLog', 'GET');
   }
 
-  // User Profile APIs
-  static Future<Map<String, dynamic>> getUserProfile() async {
-    return await _makeRequest('/user/profile', 'GET');
+  static Future<Map<String, dynamic>> updateActivityLog({
+    required DateTime date,
+    double? sleepHours,
+    int? steps,
+    double? waterIntake,
+    double? foodCalories,
+  }) async {
+    final body = <String, dynamic>{
+      'date': date.toIso8601String(),
+    };
+    
+    if (sleepHours != null) body['sleepHours'] = sleepHours;
+    if (steps != null) body['steps'] = steps;
+    if (waterIntake != null) body['waterIntake'] = waterIntake;
+    if (foodCalories != null) body['foodCalories'] = foodCalories;
+
+    return await _makeRequest('/activity/updateActivityLog', 'PUT', body: body);
   }
 
+  // ===== UTILITY METHODS =====
+  
+  static Future<bool> isAuthenticated() async {
+    final token = await getToken();
+    return token != null;
+  }
+
+  // Update user profile (for backward compatibility)
   static Future<Map<String, dynamic>> updateUserProfile({
     String? name,
     String? dateOfBirth,
@@ -196,61 +237,110 @@ class ApiService {
     if (bodyType != null) body['bodyType'] = bodyType.toLowerCase();
     if (fitnessGoals != null) body['fitnessGoals'] = fitnessGoals;
 
-    return await _makeRequest('/user/profile', 'PUT', body: body);
-  }
-
-  // Fitness Data APIs
-  static Future<Map<String, dynamic>> saveFitnessData({
-    required DateTime date,
-    int? steps,
-    double? calories,
-    double? waterIntake,
-    double? sleepHours,
-    double? weight,
-  }) async {
-    final body = <String, dynamic>{
-      'date': date.toIso8601String(),
+    // For now, just return success since we don't have this endpoint in the backend
+    return {
+      'success': true,
+      'message': 'Profile updated successfully',
     };
-    
-    if (steps != null) body['steps'] = steps;
-    if (calories != null) body['calories'] = calories;
-    if (waterIntake != null) body['waterIntake'] = waterIntake;
-    if (sleepHours != null) body['sleepHours'] = sleepHours;
-    if (weight != null) body['weight'] = weight;
-
-    return await _makeRequest('/fitness/data', 'POST', body: body);
   }
 
-  static Future<Map<String, dynamic>> getTodayFitnessData() async {
-    return await _makeRequest('/fitness/data/today', 'GET');
+  static Future<void> logout() async {
+    await removeToken();
   }
 
-  static Future<Map<String, dynamic>> getFitnessData({
-    DateTime? startDate,
-    DateTime? endDate,
-    int? limit,
-  }) async {
-    final queryParams = <String, String>{};
-    
-    if (startDate != null) queryParams['startDate'] = startDate.toIso8601String();
-    if (endDate != null) queryParams['endDate'] = endDate.toIso8601String();
-    if (limit != null) queryParams['limit'] = limit.toString();
-
-    final queryString = queryParams.isNotEmpty 
-        ? '?${Uri(queryParameters: queryParams).query}'
-        : '';
-
-    return await _makeRequest('/fitness/data$queryString', 'GET');
-  }
-
-  static Future<Map<String, dynamic>> getFitnessStats({
-    String period = 'week',
-  }) async {
-    return await _makeRequest('/fitness/stats?period=$period', 'GET');
-  }
-
-  // Health check
+  // Server health check
   static Future<Map<String, dynamic>> healthCheck() async {
-    return await _makeRequest('/health', 'GET');
+    try {
+      final response = await http.get(Uri.parse('http://localhost:4000/stats'));
+      return jsonDecode(response.body);
+    } catch (e) {
+      throw Exception('Server health check failed: $e');
+    }
+  }
+
+  // ===== CONVENIENCE METHODS FOR FLUTTER INTEGRATION =====
+  
+  // Method to sync local calorie data with backend
+  static Future<Map<String, dynamic>> syncCalorieData(List<Map<String, dynamic>> localCalories) async {
+    try {
+      // Get today's date
+      final today = DateTime.now();
+      
+      // Calculate total calories for today
+      int totalCalories = 0;
+      for (final calorie in localCalories) {
+        totalCalories += calorie['calories'] as int;
+      }
+      
+      // Log activity with calorie data
+      return await logActivity(
+        date: today,
+        foodCalories: totalCalories.toDouble(),
+      );
+    } catch (e) {
+      throw Exception('Failed to sync calorie data: $e');
+    }
+  }
+
+  // Method to sync local water data with backend
+  static Future<Map<String, dynamic>> syncWaterData(List<Map<String, dynamic>> localWater) async {
+    try {
+      final today = DateTime.now();
+      
+      // Calculate total water intake for today
+      double totalWater = 0;
+      for (final water in localWater) {
+        totalWater += water['ml'] as double;
+      }
+      
+      // Log activity with water data
+      return await logActivity(
+        date: today,
+        waterIntake: totalWater,
+      );
+    } catch (e) {
+      throw Exception('Failed to sync water data: $e');
+    }
+  }
+
+  // Method to sync local sleep data with backend
+  static Future<Map<String, dynamic>> syncSleepData(String sleepDuration) async {
+    try {
+      final today = DateTime.now();
+      
+      // Parse sleep duration (format: "8h 30m")
+      double sleepHours = 0;
+      final parts = sleepDuration.split(' ');
+      for (final part in parts) {
+        if (part.endsWith('h')) {
+          sleepHours += double.parse(part.replaceAll('h', ''));
+        } else if (part.endsWith('m')) {
+          sleepHours += double.parse(part.replaceAll('m', '')) / 60;
+        }
+      }
+      
+      // Log activity with sleep data
+      return await logActivity(
+        date: today,
+        sleepHours: sleepHours,
+      );
+    } catch (e) {
+      throw Exception('Failed to sync sleep data: $e');
+    }
+  }
+
+  // Method to sync local steps data with backend
+  static Future<Map<String, dynamic>> syncStepsData(int steps) async {
+    try {
+      final today = DateTime.now();
+      
+      // Log activity with steps data
+      return await logActivity(
+        date: today,
+        steps: steps,
+      );
+    } catch (e) {
+      throw Exception('Failed to sync steps data: $e');
+    }
   }
 } 

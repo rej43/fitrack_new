@@ -7,31 +7,54 @@ import 'dart:convert';
 import 'package:fitrack/view/main_tab/maintab_view.dart';
 
 class FoodLog {
-  final String food;
+  final String foodName;
   final int calories;
   final DateTime timestamp;
 
   FoodLog({
-    required this.food,
+    required this.foodName,
     required this.calories,
     required this.timestamp,
   });
 
   Map<String, dynamic> toJson() => {
-    'food': food,
+    'foodName': foodName,
     'calories': calories,
     'timestamp': timestamp.toIso8601String(),
   };
 
-  factory FoodLog.fromJson(Map<String, dynamic> json) => FoodLog(
-    food: json['food'],
-    calories: json['calories'],
-    timestamp: DateTime.parse(json['timestamp']),
-  );
+  factory FoodLog.fromJson(Map<String, dynamic> json) {
+    String? foodName = json['foodName'];
+    if (foodName == null) {
+      foodName = json['food']; // Fallback to old structure
+    }
+    
+    if (foodName == null) {
+      throw ArgumentError('Food name is required');
+    }
+    
+    final calories = json['calories'];
+    if (calories == null) {
+      throw ArgumentError('Calories is required');
+    }
+    
+    final timestamp = json['timestamp'];
+    if (timestamp == null) {
+      throw ArgumentError('Timestamp is required');
+    }
+    
+    return FoodLog(
+      foodName: foodName,
+      calories: calories is int ? calories : int.tryParse(calories.toString()) ?? 0,
+      timestamp: DateTime.parse(timestamp),
+    );
+  }
 }
 
 class CaloriesView extends StatefulWidget {
-  const CaloriesView({super.key});
+  final VoidCallback? onCaloriesUpdated;
+  
+  const CaloriesView({super.key, this.onCaloriesUpdated});
 
   @override
   State<CaloriesView> createState() => _CaloriesViewState();
@@ -50,7 +73,40 @@ class _CaloriesViewState extends State<CaloriesView> {
     _loadSavedData();
   }
 
+  // Method to clean up corrupted data
+  Future<void> _cleanupCorruptedData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedLogs = prefs.getStringList('food_logs') ?? [];
+    final validLogs = <String>[];
+    
+    for (final logString in savedLogs) {
+      try {
+        final logData = jsonDecode(logString);
+        
+        // Check if all required fields are present
+        String? foodName = logData['foodName'];
+        if (foodName == null) {
+          foodName = logData['food']; // Fallback to old structure
+        }
+        
+        if (foodName != null && 
+            logData['calories'] != null && 
+            logData['timestamp'] != null) {
+          validLogs.add(logString);
+        }
+      } catch (e) {
+        // Skip corrupted entries
+      }
+    }
+    
+    // Save only valid logs back
+    await prefs.setStringList('food_logs', validLogs);
+  }
+
   Future<void> _loadSavedData() async {
+    // First, clean up any corrupted data
+    await _cleanupCorruptedData();
+    
     final prefs = await SharedPreferences.getInstance();
     final savedLogs = prefs.getStringList('food_logs') ?? [];
     
@@ -59,9 +115,32 @@ class _CaloriesViewState extends State<CaloriesView> {
       for (final logString in savedLogs) {
         try {
           final logData = jsonDecode(logString);
-          _foodLogs.add(FoodLog.fromJson(logData));
+          
+          // Handle both old and new data structures
+          String? foodName = logData['foodName'];
+          if (foodName == null) {
+            foodName = logData['food']; // Fallback to old structure
+          }
+          
+          if (foodName == null) {
+            continue; // Skip entries without food name
+          }
+          
+          final dynamic calories = logData['calories'];
+          final timestamp = logData['timestamp'];
+          
+          if (calories == null || timestamp == null) {
+            continue; // Skip entries with missing data
+          }
+          
+          _foodLogs.add(FoodLog(
+            foodName: foodName,
+            calories: calories is int ? calories : int.tryParse(calories.toString()) ?? 0,
+            timestamp: DateTime.parse(timestamp),
+          ));
         } catch (e) {
           // Skip invalid entries
+          print('Skipping invalid food log entry: $e');
         }
       }
     });
@@ -142,10 +221,10 @@ class _CaloriesViewState extends State<CaloriesView> {
   }
 
   void _addFoodToLog() {
-    final food = _foodController.text.trim();
+    final foodName = _foodController.text.trim();
     final caloriesText = _calorieController.text.trim();
     
-    if (food.isEmpty) {
+    if (foodName.isEmpty) {
       _showSnackBar('Please enter a food item');
       return;
     }
@@ -163,13 +242,17 @@ class _CaloriesViewState extends State<CaloriesView> {
     
     setState(() {
       _foodLogs.add(
-        FoodLog(food: food, calories: calories, timestamp: DateTime.now()),
+        FoodLog(foodName: foodName, calories: calories, timestamp: DateTime.now()),
       );
       _foodController.clear();
       _calorieController.clear();
     });
     
     _saveData();
+    
+    // Notify parent widget about calorie update
+    widget.onCaloriesUpdated?.call();
+    
     _showSnackBar('Food logged successfully!');
   }
 
@@ -200,6 +283,10 @@ class _CaloriesViewState extends State<CaloriesView> {
                 _foodLogs.clear();
               });
               _saveData();
+              
+              // Notify parent widget about calorie update
+              widget.onCaloriesUpdated?.call();
+              
               Navigator.pop(context);
               _showSnackBar('All logs cleared');
             },
@@ -434,7 +521,7 @@ class _CaloriesViewState extends State<CaloriesView> {
                                 color: Colors.deepOrange,
                               ),
                               title: Text(
-                                log.food,
+                                log.foodName,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                 ),

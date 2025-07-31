@@ -1,0 +1,3 @@
+[submodule "backend/fitTrack-backend"]
+	path = backend/fitTrack-backend
+	url = https://github.com/yashanand167/fitTrack-backend

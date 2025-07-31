@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fitrack/common/color_extension.dart';
+import 'package:fitrack/view/main_tab/maintab_view.dart';
+import 'package:fitrack/models/user_model.dart';
 
 class CommunityView extends StatefulWidget {
   const CommunityView({super.key});
@@ -9,8 +11,22 @@ class CommunityView extends StatefulWidget {
 }
 
 class _CommunityViewState extends State<CommunityView> {
-  // Simulate current user (replace with your auth/user logic)
-  final String currentUserName = 'Alice';
+  // Fetch current user's name from UserModel (replace with your actual user fetching logic if needed)
+  String get currentUserName => _userName ?? 'User';
+  String? _userName;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserName();
+  }
+
+  Future<void> _loadUserName() async {
+    final user = await UserModel.loadFromLocal();
+    setState(() {
+      _userName = user?.name ?? 'User';
+    });
+  }
 
   // Sample data with comments and likedBy
   final List<Map<String, dynamic>> posts = [
@@ -88,9 +104,16 @@ class _CommunityViewState extends State<CommunityView> {
               ),
               const SizedBox(height: 12),
               ...List.generate(posts[index]['comments'].length, (cIdx) {
+                final commentText = posts[index]['comments'][cIdx];
                 return ListTile(
                   leading: Icon(Icons.comment, color: TColor.primaryColor1),
-                  title: Text(posts[index]['comments'][cIdx]),
+                  title: Text(commentText),
+                  onTap: () {
+                    // Copy comment to input for editing/resending
+                    commentController.text = commentText;
+                    // Optionally, focus the input field
+                    FocusScope.of(context).requestFocus(FocusNode());
+                  },
                 );
               }),
               const Divider(),
@@ -163,7 +186,7 @@ class _CommunityViewState extends State<CommunityView> {
                         'avatar': null,
                         'activity': text,
                         'time': 'Just now',
-                        'likes': 0,
+                        'likes': 1, // Self-like
                         'likedBy': <String>{currentUserName},
                         'comments': [],
                       });
@@ -185,6 +208,15 @@ class _CommunityViewState extends State<CommunityView> {
         elevation: 1,
         backgroundColor: TColor.primaryColor1,
         centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black87),
+          onPressed: () {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const MainTabView()),
+              (route) => false,
+            );
+          },
+        ),
         title: const Text(
           'Community',
           style: TextStyle(

@@ -1,6 +1,7 @@
 import 'package:fitrack/common_widget/round_button.dart';
 import 'package:flutter/material.dart';
 import 'package:fitrack/common/color_extension.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PersonalDataScreen extends StatefulWidget {
   const PersonalDataScreen({Key? key}) : super(key: key);
@@ -16,17 +17,103 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
   String? bp;
   String? notes;
   // ignore_for_file: unused_import
+  final FocusNode _focusNode = FocusNode();
+  bool isLoading = true;
+  
+  // Add controllers for proper data persistence
+  late TextEditingController disabilityController;
+  late TextEditingController sugarController;
+  late TextEditingController bpController;
+  late TextEditingController notesController;
 
-  void _saveData() {
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controllers
+    disabilityController = TextEditingController();
+    sugarController = TextEditingController();
+    bpController = TextEditingController();
+    notesController = TextEditingController();
+    _loadPersonalData();
+  }
+
+  @override
+  void dispose() {
+    // Dispose controllers to prevent memory leaks
+    disabilityController.dispose();
+    sugarController.dispose();
+    bpController.dispose();
+    notesController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadPersonalData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      setState(() {
+        disability = prefs.getString('personal_disability') ?? '';
+        sugar = prefs.getString('personal_sugar') ?? '';
+        bp = prefs.getString('personal_bp') ?? '';
+        notes = prefs.getString('personal_notes') ?? '';
+        
+        // Set controller values
+        disabilityController.text = disability ?? '';
+        sugarController.text = sugar ?? '';
+        bpController.text = bp ?? '';
+        notesController.text = notes ?? '';
+        
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _saveData() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       FocusScope.of(context).unfocus();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Personal data saved.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
+      
+      try {
+        // Get values from controllers
+        final disabilityValue = disabilityController.text;
+        final sugarValue = sugarController.text;
+        final bpValue = bpController.text;
+        final notesValue = notesController.text;
+        
+        // Save personal data to SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('personal_disability', disabilityValue);
+        await prefs.setString('personal_sugar', sugarValue);
+        await prefs.setString('personal_bp', bpValue);
+        await prefs.setString('personal_notes', notesValue);
+        
+        // Update local variables
+        setState(() {
+          disability = disabilityValue;
+          sugar = sugarValue;
+          bp = bpValue;
+          notes = notesValue;
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Personal data saved successfully!'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error saving data: ${e.toString()}'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
 
@@ -57,13 +144,13 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              _buildTextField('Disability (if any)', (val) => disability = val),
+              _buildTextFieldWithController('Disability (if any)', disabilityController),
               const SizedBox(height: 12),
-              _buildTextField('Sugar Level', (val) => sugar = val),
+              _buildTextFieldWithController('Sugar Level', sugarController),
               const SizedBox(height: 12),
-              _buildTextField('Blood Pressure', (val) => bp = val),
+              _buildTextFieldWithController('Blood Pressure', bpController),
               const SizedBox(height: 12),
-              _buildTextField('Other Notes', (val) => notes = val),
+              _buildTextFieldWithController('Other Notes', notesController),
               const SizedBox(height: 24),
               RoundButton(title: 'Save', onPressed: _saveData),
             ],
@@ -73,8 +160,9 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
     );
   }
 
-  Widget _buildTextField(String label, Function(String?) onSaved) {
+  Widget _buildTextFieldWithController(String label, TextEditingController controller) {
     return TextFormField(
+      controller: controller,
       decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(color: TColor.black),
@@ -90,7 +178,6 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
         fillColor: TColor.white,
       ),
       validator: (value) => value!.isEmpty ? 'Please enter $label' : null,
-      onSaved: onSaved,
       onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
     );
   }

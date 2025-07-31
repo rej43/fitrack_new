@@ -7,6 +7,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fitrack/common_widget/round_button.dart';
 import 'package:fitrack/common_widget/round_input_container.dart';
+import 'package:fitrack/services/api_service.dart';
+import 'package:fitrack/models/user_model.dart';
 
 class CompleteProfileView extends StatefulWidget {
   const CompleteProfileView({super.key});
@@ -27,6 +29,8 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
   double _selectedHeight = 170.0;
   String? _weightErrorText;
   String? _heightErrorText;
+  bool _isLoading = false;
+  UserModel? _currentUser;
 
   List<double> weightOptions = List.generate(
     1001,
@@ -38,9 +42,129 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
   );
 
   @override
+  void initState() {
+    super.initState();
+    _loadCurrentUser();
+  }
+
+  Future<void> _loadCurrentUser() async {
+    try {
+      final user = await UserModel.loadFromLocal();
+      if (user != null) {
+        setState(() {
+          _currentUser = user;
+          _selectedHeight = user.height ?? 170.0;
+          _selectedWeight = user.weight ?? 60.0;
+          _selectedGender = user.gender;
+          if (user.dateOfBirth != null) {
+            _dateOfBirthController.text = 
+                "${user.dateOfBirth!.day}/${user.dateOfBirth!.month}/${user.dateOfBirth!.year}";
+          }
+        });
+      }
+    } catch (e) {
+      print('Error loading user data: $e');
+    }
+  }
+
+  @override
   void dispose() {
     _dateOfBirthController.dispose();
     super.dispose();
+  }
+
+  Future<void> _saveProfileData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Parse date of birth
+      DateTime? dateOfBirth;
+      if (_dateOfBirthController.text.isNotEmpty) {
+        final parts = _dateOfBirthController.text.split('/');
+        if (parts.length == 3) {
+          dateOfBirth = DateTime(
+            int.parse(parts[2]), // year
+            int.parse(parts[1]), // month
+            int.parse(parts[0]), // day
+          );
+        }
+      }
+
+      // Update existing user or create new one
+      UserModel updatedUser;
+      if (_currentUser != null) {
+        updatedUser = _currentUser!.copyWith(
+          dateOfBirth: dateOfBirth,
+          gender: _selectedGender,
+          height: _selectedHeight,
+          weight: _selectedWeight,
+          isProfileComplete: true,
+        );
+      } else {
+        updatedUser = UserModel(
+          name: "User",
+          email: "user@example.com",
+          dateOfBirth: dateOfBirth,
+          gender: _selectedGender,
+          height: _selectedHeight,
+          weight: _selectedWeight,
+          isProfileComplete: true,
+        );
+      }
+
+      // Save user data locally
+      await updatedUser.saveToLocal();
+
+      // Try to update on server if we have a user ID
+      if (updatedUser.id != null) {
+        try {
+          await ApiService.updateUserProfile(
+            dateOfBirth: dateOfBirth?.toIso8601String(),
+            gender: _selectedGender,
+            height: _selectedHeight,
+            weight: _selectedWeight,
+          );
+        } catch (e) {
+          print('Server update failed, but local data saved: $e');
+        }
+      }
+
+             // Show success message
+       if (mounted) {
+         ScaffoldMessenger.of(context).showSnackBar(
+           SnackBar(
+             content: Text('Profile updated successfully!'),
+             backgroundColor: Colors.green,
+             duration: Duration(seconds: 2),
+           ),
+         );
+
+        // Navigate to body type selection
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const BodyTypeSelectionPage(),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -345,8 +469,8 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                         ),
                         SizedBox(height: media.width * 0.07),
                         RoundButton(
-                          title: "Next >",
-                          onPressed: () {
+                          title: _isLoading ? "Saving..." : "Next >",
+                          onPressed: _isLoading ? () {} : () {
                             bool isFormValid =
                                 _formKey.currentState?.validate() ?? false;
                             bool isGenderSelected = _selectedGender != null;
@@ -374,21 +498,8 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                                     weightOptions.indexOf(60.0) == 0) &&
                                 !(_selectedHeight == 170.0 &&
                                     heightOptions.indexOf(170.0) == 0)) {
-                              print("Gender: $_selectedGender");
-                              print(
-                                "Date of Birth: ${_dateOfBirthController.text}",
-                              );
-                              print("Weight: $_selectedWeight KG");
-                              print("Height: $_selectedHeight CM");
-
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) =>
-                                          const BodyTypeSelectionPage(),
-                                ),
-                              );
+                              
+                              _saveProfileData();
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(

@@ -1,3 +1,4 @@
+import 'package:fitrack/common/color_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pedometer/pedometer.dart';
@@ -92,7 +93,12 @@ class _StepTrackerPageState extends State<StepTrackerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Step Tracker")),
+      appBar: AppBar(
+          title: const Text(
+            'Step Tracker',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          backgroundColor: TColor.primaryColor1,),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

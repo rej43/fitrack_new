@@ -20,7 +20,7 @@ class TabButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: SizedBox(
-        width: 60,
+        width: 70,  // Increased width to accommodate longer text
         height: 56,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -36,11 +36,12 @@ class TabButton extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontSize: 9,
+                fontSize: 8,  // Slightly reduced font size to prevent overflow
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
                 color: isActive ? Colors.black : Colors.black54,
               ),
               textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,  // Added overflow handling
             ),
             const SizedBox(height: 4),
             if (isActive)

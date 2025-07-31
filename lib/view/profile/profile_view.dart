@@ -2,7 +2,6 @@ import 'package:fitrack/common/color_extension.dart';
 
 import 'package:fitrack/common_widget/setting_row.dart';
 import 'package:fitrack/common_widget/title_subtitle_cell.dart';
-import 'package:fitrack/common_widget/editable_title_subtitle_cell.dart';
 import 'package:fitrack/view/profile/personaldata_view.dart';
 import 'package:flutter/material.dart';
 //ignore_for_file: unused_import
@@ -10,6 +9,8 @@ import 'package:fitrack/common_widget/round_button.dart';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:fitrack/view/on_boarding/started_view.dart';
+import 'package:fitrack/models/user_model.dart';
+import 'package:fitrack/services/api_service.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -20,10 +21,8 @@ class ProfileView extends StatefulWidget {
 
 class _ProfileViewState extends State<ProfileView> {
   bool positive = false;
-
-  String height = "180cm";
-  String weight = "65kg";
-  final String age = "22yo";
+  UserModel? user;
+  bool isLoading = true;
 
   List accountArr = [
     {"image": "assets/img/user.png", "name": "Personal Data", "tag": "1"},
@@ -35,61 +34,213 @@ class _ProfileViewState extends State<ProfileView> {
     {"image": "assets/img/setting.png", "name": "Logout", "tag": "7"},
   ];
 
-  Future<void> _editValueDialog({
-    required String title,
-    required String initialValue,
-    required String unit,
-    required ValueChanged<String> onChanged,
-  }) async {
-    final controller = TextEditingController(
-      text: initialValue.replaceAll(unit, ''),
-    );
-    String? errorText;
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setStateDialog) {
-            return AlertDialog(
-              title: Text('Edit $title'),
-              content: TextField(
-                controller: controller,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  suffixText: unit,
-                  errorText: errorText,
-                ),
-                autofocus: true,
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    final value = controller.text.trim();
-                    if (value.isEmpty || double.tryParse(value) == null) {
-                      setStateDialog(() {
-                        errorText = 'Please enter a valid number';
-                      });
-                      return;
-                    }
-                    onChanged('$value$unit');
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Save'),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
   }
 
+  Future<void> _refreshUserData() async {
+    await _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final userData = await UserModel.loadFromLocal();
+      setState(() {
+        user = userData;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void _showEditProfileDialog() {
+    final heightController = TextEditingController(text: user?.height?.toString() ?? '');
+    final weightController = TextEditingController(text: user?.weight?.toString() ?? '');
+    String? selectedGender = user?.gender;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: TColor.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          'Edit Profile',
+          style: TextStyle(
+            color: TColor.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: TColor.lightgrey,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: TextField(
+                  controller: heightController,
+                  decoration: InputDecoration(
+                    labelText: 'Height (cm)',
+                    labelStyle: TextStyle(color: TColor.grey),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  ),
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(color: TColor.black),
+                ),
+              ),
+              SizedBox(height: 15),
+              Container(
+                decoration: BoxDecoration(
+                  color: TColor.lightgrey,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: TextField(
+                  controller: weightController,
+                  decoration: InputDecoration(
+                    labelText: 'Weight (kg)',
+                    labelStyle: TextStyle(color: TColor.grey),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  ),
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(color: TColor.black),
+                ),
+              ),
+              SizedBox(height: 15),
+              Container(
+                decoration: BoxDecoration(
+                  color: TColor.lightgrey,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: DropdownButtonFormField<String>(
+                  value: selectedGender,
+                  decoration: InputDecoration(
+                    labelText: 'Gender',
+                    labelStyle: TextStyle(color: TColor.grey),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  ),
+                  dropdownColor: TColor.white,
+                  style: TextStyle(color: TColor.black),
+                  items: ['Male', 'Female', 'Non-binary'].map((gender) {
+                    return DropdownMenuItem(
+                      value: gender,
+                      child: Text(gender, style: TextStyle(color: TColor.black)),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    selectedGender = value;
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: TColor.grey),
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: TColor.primaryG),
+              borderRadius: BorderRadius.circular(25),
+            ),
+            child: ElevatedButton(
+              onPressed: () async {
+                final newHeight = double.tryParse(heightController.text);
+                final newWeight = double.tryParse(weightController.text);
+                
+                if (newHeight != null && newWeight != null && selectedGender != null) {
+                  // Update user data
+                  final updatedUser = user?.copyWith(
+                    height: newHeight,
+                    weight: newWeight,
+                    gender: selectedGender,
+                  );
+                  
+                  if (updatedUser != null) {
+                    await updatedUser.saveToLocal();
+                    setState(() {
+                      user = updatedUser;
+                    });
+                    
+                    // Show success message
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Profile updated successfully!'),
+                        backgroundColor: Colors.green,
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                    
+                    Navigator.pop(context);
+                  }
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Please fill all fields correctly'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+              ),
+              child: Text(
+                'Save',
+                style: TextStyle(
+                  color: TColor.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: TColor.white,
+          centerTitle: true,
+          elevation: 0,
+          title: Text(
+            "Profile",
+            style: TextStyle(
+              color: TColor.black,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: TColor.white,
@@ -104,11 +255,34 @@ class _ProfileViewState extends State<ProfileView> {
             fontWeight: FontWeight.w700,
           ),
         ),
-        actions: [],
+        actions: [
+          Container(
+            margin: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: TColor.primaryG),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: GestureDetector(
+              onTap: () {
+                _showEditProfileDialog();
+              },
+              child: Container(
+                padding: EdgeInsets.all(8),
+                child: Icon(
+                  Icons.edit,
+                  color: TColor.white,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       backgroundColor: TColor.white,
-      body: SingleChildScrollView(
-        child: Container(
+      body: RefreshIndicator(
+        onRefresh: _refreshUserData,
+        child: SingleChildScrollView(
+          child: Container(
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -130,7 +304,7 @@ class _ProfileViewState extends State<ProfileView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Joe Goldberg",
+                          user?.name ?? "Loading...",
                           style: TextStyle(
                             color: TColor.black,
                             fontSize: 14,
@@ -146,37 +320,24 @@ class _ProfileViewState extends State<ProfileView> {
               Row(
                 children: [
                   Expanded(
-                    child: EditableTitleSubtitleCell(
-                      title: height,
+                    child: TitleSubtitleCell(
+                      title: "${user?.height?.toStringAsFixed(0) ?? '--'}cm",
                       subtitle: "Height",
-                      onTap: () async {
-                        await _editValueDialog(
-                          title: "Height",
-                          initialValue: height,
-                          unit: "cm",
-                          onChanged: (val) => setState(() => height = val),
-                        );
-                      },
                     ),
                   ),
-                  const SizedBox(width: 15),
+                  SizedBox(width: 15),
                   Expanded(
-                    child: EditableTitleSubtitleCell(
-                      title: weight,
-                      subtitle: "Weight",
-                      onTap: () async {
-                        await _editValueDialog(
-                          title: "Weight",
-                          initialValue: weight,
-                          unit: "kg",
-                          onChanged: (val) => setState(() => weight = val),
-                        );
-                      },
+                    child: TitleSubtitleCell(
+                      title: "${user?.weight?.toStringAsFixed(1) ?? '--'}kg", 
+                      subtitle: "Weight"
                     ),
                   ),
-                  const SizedBox(width: 15),
+                  SizedBox(width: 15),
                   Expanded(
-                    child: TitleSubtitleCell(title: age, subtitle: "Age"),
+                    child: TitleSubtitleCell(
+                      title: "${user?.age ?? '--'}yo", 
+                      subtitle: "Age"
+                    ),
                   ),
                 ],
               ),
@@ -383,7 +544,7 @@ class _ProfileViewState extends State<ProfileView> {
                                     (context) => AlertDialog(
                                       title: const Text('Contact Us'),
                                       content: const Text(
-                                        'Email: support@fitrackapp.com\nPhone: +977 9886649109',
+                                        'Email: support@fitrackapp.com\nPhone: +1 234 567 8901\nAddress: 123 Fit St, Wellness City',
                                       ),
                                       actions: [
                                         TextButton(
@@ -429,16 +590,31 @@ class _ProfileViewState extends State<ProfileView> {
                                           child: const Text('No'),
                                         ),
                                         TextButton(
-                                          onPressed: () {
-                                            Navigator.of(
-                                              context,
-                                            ).pushAndRemoveUntil(
-                                              MaterialPageRoute(
-                                                builder:
-                                                    (_) => const StartedView(),
-                                              ),
-                                              (route) => false,
-                                            );
+                                          onPressed: () async {
+                                            try {
+                                              await ApiService.logout();
+                                              await UserModel.clearFromLocal();
+                                              if (mounted) {
+                                                Navigator.of(
+                                                  context,
+                                                ).pushAndRemoveUntil(
+                                                  MaterialPageRoute(
+                                                    builder:
+                                                        (_) => const StartedView(),
+                                                  ),
+                                                  (route) => false,
+                                                );
+                                              }
+                                            } catch (e) {
+                                              if (mounted) {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text('Logout error: ${e.toString()}'),
+                                                    backgroundColor: Colors.red,
+                                                  ),
+                                                );
+                                              }
+                                            }
                                           },
                                           child: const Text('Yes'),
                                         ),
@@ -455,6 +631,7 @@ class _ProfileViewState extends State<ProfileView> {
               ),
             ],
           ),
+        ),
         ),
       ),
     );

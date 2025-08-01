@@ -103,9 +103,13 @@ class ApiService {
       'password': password,
     });
 
-    // Save token if provided in response
+    // Save token and user data if provided in response
     if (response['token'] != null) {
       await saveToken(response['token']);
+    }
+    
+    if (response['user'] != null) {
+      await _saveUserData(response['user']);
     }
 
     return response;
@@ -120,9 +124,73 @@ class ApiService {
       'password': password,
     });
 
-    // Save token if provided in response
+    // Save token and user data if provided in response
     if (response['token'] != null) {
       await saveToken(response['token']);
+    }
+    
+    if (response['user'] != null) {
+      await _saveUserData(response['user']);
+    }
+
+    return response;
+  }
+
+  // Helper method to save user data
+  static Future<void> _saveUserData(Map<String, dynamic> userData) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_data', jsonEncode(userData));
+  }
+
+  // Get current user data
+  static Future<Map<String, dynamic>?> getCurrentUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userData = prefs.getString('user_data');
+    if (userData != null) {
+      try {
+        return jsonDecode(userData);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  // Update user profile
+  static Future<Map<String, dynamic>> updateUserProfile({
+    String? firstName,
+    String? lastName,
+    String? email,
+  }) async {
+    final response = await _makeRequest('/auth/profile', 'PUT', body: {
+      if (firstName != null) 'firstName': firstName,
+      if (lastName != null) 'lastName': lastName,
+      if (email != null) 'email': email,
+    });
+
+    // Update local user data if successful
+    if (response['success'] == true && response['user'] != null) {
+      await _saveUserData(response['user']);
+    }
+
+    return response;
+  }
+
+  // Google OAuth
+  static String getGoogleAuthUrl() {
+    return '$apiUrl/auth/google';
+  }
+
+  static Future<Map<String, dynamic>> googleAuthCallback(String code) async {
+    final response = await _makeRequest('/auth/google/callback', 'GET');
+    
+    // Save token and user data if provided in response
+    if (response['token'] != null) {
+      await saveToken(response['token']);
+    }
+    
+    if (response['user'] != null) {
+      await _saveUserData(response['user']);
     }
 
     return response;
@@ -217,8 +285,8 @@ class ApiService {
     return token != null;
   }
 
-  // Update user profile (for backward compatibility)
-  static Future<Map<String, dynamic>> updateUserProfile({
+  // Update user profile (for backward compatibility with legacy code)
+  static Future<Map<String, dynamic>> updateUserProfileLegacy({
     String? name,
     String? dateOfBirth,
     String? gender,
@@ -246,6 +314,9 @@ class ApiService {
 
   static Future<void> logout() async {
     await removeToken();
+    // Also clear user data
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('user_data');
   }
 
   // Server health check

@@ -183,7 +183,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
         filled: true,
         fillColor: TColor.white,
       ),
-      validator: (value) => value!.isEmpty ? 'Please enter $label' : null,
+      validator: (value) => null, // Make fields optional
       onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
     );
   }

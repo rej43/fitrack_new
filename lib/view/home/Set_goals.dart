@@ -157,10 +157,59 @@ class _SetGoalsScreenState extends State<SetGoalsView> {
   }
 
   void _toggleGoal(int index) {
+    final wasCompleted = _goals[index].isCompleted;
     setState(() {
       _goals[index].isCompleted = !_goals[index].isCompleted;
     });
     _saveGoals();
+    
+    // Show toast message when a goal is completed
+    if (!wasCompleted && _goals[index].isCompleted) {
+      final remainingGoals = _goals.where((goal) => !goal.isCompleted).length;
+      _showGoalCompletionToast(remainingGoals);
+    }
+  }
+
+  void _showGoalCompletionToast(int remainingGoals) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.check_circle,
+              color: TColor.white,
+              size: 20,
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                remainingGoals == 0 
+                    ? "All goals completed! 🎉" 
+                    : "$remainingGoals goal${remainingGoals == 1 ? '' : 's'} left to complete",
+                style: TextStyle(
+                  color: TColor.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: remainingGoals == 0 ? Colors.green : TColor.primaryColor1,
+        duration: Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        action: SnackBarAction(
+          label: "OK",
+          textColor: TColor.white,
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
   }
 
   void _deleteGoal(int index) {

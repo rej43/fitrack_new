@@ -11,6 +11,7 @@ import 'package:fitrack/view/home/notification_view.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:fitrack/models/user_model.dart';
+import 'package:fitrack/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
@@ -24,6 +25,7 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   UserModel? user;
+  Map<String, dynamic>? currentUser;
   bool isLoading = true;
   
   // Dynamic data variables
@@ -317,9 +319,13 @@ class _HomeViewState extends State<HomeView> {
 
   Future<void> _loadUserData() async {
     try {
+      // Load both legacy UserModel and new API user data
       final userData = await UserModel.loadFromLocal();
+      final apiUserData = await ApiService.getCurrentUser();
+      
       setState(() {
         user = userData;
+        currentUser = apiUserData;
         isLoading = false;
       });
     } catch (e) {
@@ -329,9 +335,70 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
+  String _getUserName() {
+    // Try to get name from API user data first
+    if (currentUser != null) {
+      if (currentUser!['firstName'] != null && currentUser!['lastName'] != null) {
+        return '${currentUser!['firstName']} ${currentUser!['lastName']}';
+      } else if (currentUser!['name'] != null) {
+        return currentUser!['name'];
+      }
+    }
+    
+    // Fallback to legacy user model
+    if (user?.name != null) {
+      return user!.name!;
+    }
+    
+    return "User";
+  }
+
   double get _waterProgress => (_todayWaterIntake / _waterGoal).clamp(0, 1);
   double get _calorieProgress => (_todayCalories / _calorieGoal).clamp(0, 1); // Progress: 310/1000 = 31%
   int get _caloriesLeft => (_calorieGoal - _todayCalories).clamp(0, _calorieGoal); // 1000 - 310 = 690 kcal left
+
+  void _showGoalCompletionToast(int newCompletedGoals) {
+    final remainingGoals = _totalGoals - _completedGoals;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.check_circle,
+              color: TColor.white,
+              size: 20,
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                remainingGoals == 0 
+                    ? "All goals completed! 🎉" 
+                    : "$remainingGoals goal${remainingGoals == 1 ? '' : 's'} left to complete",
+                style: TextStyle(
+                  color: TColor.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: remainingGoals == 0 ? Colors.green : TColor.primaryColor1,
+        duration: Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        action: SnackBarAction(
+          label: "OK",
+          textColor: TColor.white,
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -357,7 +424,7 @@ class _HomeViewState extends State<HomeView> {
                           style: TextStyle(color: TColor.grey, fontSize: 15),
                         ),
                         Text(
-                          user?.name ?? "User",
+                          _getUserName(),
                           style: TextStyle(
                             color: TColor.black,
                             fontSize: 20,
@@ -490,15 +557,25 @@ class _HomeViewState extends State<HomeView> {
                               type: RoundButtonType.bgGradient,
                               fontSize: 12,
                               onPressed: () async {
+                                // Store the number of completed goals before navigation
+                                final completedBefore = _completedGoals;
+                                
                                 await Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => SetGoalsView(),
                                   ),
                                 );
+                                
                                 // Refresh goals data when returning from goals screen
-                                _loadGoalsData();
+                                await _loadGoalsData();
                                 setState(() {});
+                                
+                                // Show toast if new goals were completed
+                                if (_completedGoals > completedBefore) {
+                                  final newCompleted = _completedGoals - completedBefore;
+                                  _showGoalCompletionToast(newCompleted);
+                                }
                               },
                             ),
                           ),

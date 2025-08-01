@@ -1,11 +1,11 @@
 import 'package:fitrack/common/color_extension.dart';
 import 'package:fitrack/common_widget/round_button.dart';
 import 'package:fitrack/common_widget/round_textfiled.dart';
+import 'package:fitrack/services/api_service.dart';
 import 'package:fitrack/view/login/complete_profile_view.dart';
 import 'package:fitrack/view/login/login_view.dart';
 import 'package:flutter/material.dart';
-// ignore: unused_import
-import 'package:fitrack/view/login/welcome_view.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
@@ -24,6 +24,7 @@ class _SignUpViewState extends State<SignUpView> {
 
   bool isCheck = false;
   bool _obscureText = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -32,6 +33,96 @@ class _SignUpViewState extends State<SignUpView> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleGoogleSignUp() async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final googleAuthUrl = ApiService.getGoogleAuthUrl();
+      final uri = Uri.parse(googleAuthUrl);
+      
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        throw Exception('Could not launch Google OAuth');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Google Sign-Up failed: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _handleEmailSignUp() async {
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill in all required fields correctly.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (!isCheck) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please accept the Privacy Policy and Term of Use.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final response = await ApiService.signup(
+        firstName: _firstNameController.text.trim(),
+        lastName: _lastNameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      if (response['success'] == true) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const CompleteProfileView(),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message'] ?? 'Registration failed'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Registration failed: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -170,45 +261,8 @@ class _SignUpViewState extends State<SignUpView> {
                   ),
                   SizedBox(height: media.width * 0.05),
                   RoundButton(
-                    title: "Register",
-                    onPressed: () {
-                      if (_formKey.currentState?.validate() ?? false) {
-                        if (!isCheck) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                "Please accept the Privacy Policy and Term of Use.",
-                              ),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        } else {
-                          // String enteredFirstName = _firstNameController.text.trim(); // No longer needed here if not passing to WelcomeView
-                          print("First Name: ${_firstNameController.text}");
-                          print("Last Name: ${_lastNameController.text}");
-                          print("Email: ${_emailController.text}");
-                          print("Password: ${_passwordController.text}");
-
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) =>
-                                      const CompleteProfileView(), // Direct navigation to CompleteProfileView
-                            ),
-                          );
-                        }
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              "Please fill in all required fields correctly.",
-                            ),
-                            backgroundColor: const Color(0xFF00E6D5),
-                          ),
-                        );
-                      }
-                    },
+                    title: _isLoading ? "Registering..." : "Register",
+                    onPressed: _isLoading ? null : () => _handleEmailSignUp(),
                   ),
                   SizedBox(height: media.width * 0.03),
                   Row(
@@ -232,53 +286,40 @@ class _SignUpViewState extends State<SignUpView> {
                     ],
                   ),
                   SizedBox(height: media.width * 0.03),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () {},
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: TColor.white,
-                            border: Border.all(
-                              width: 1,
-                              color: TColor.grey.withOpacity(0.4),
-                            ),
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: Image.asset(
+                  GestureDetector(
+                    onTap: _isLoading ? null : () => _handleGoogleSignUp(),
+                    child: Container(
+                      width: double.infinity,
+                      height: 50,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: TColor.white,
+                        border: Border.all(
+                          width: 1,
+                          color: TColor.grey.withOpacity(0.4),
+                        ),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
                             "assets/img/google.png",
                             width: 20,
                             height: 20,
                           ),
-                        ),
-                      ),
-                      SizedBox(width: media.width * 0.04),
-                      GestureDetector(
-                        onTap: () {},
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: TColor.white,
-                            border: Border.all(
-                              width: 1,
-                              color: TColor.grey.withOpacity(0.4),
+                          const SizedBox(width: 10),
+                          Text(
+                            _isLoading ? "Signing up..." : "Continue with Google",
+                            style: TextStyle(
+                              color: TColor.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
                             ),
-                            borderRadius: BorderRadius.circular(15),
                           ),
-                          child: Image.asset(
-                            "assets/img/facebook.png",
-                            width: 20,
-                            height: 20,
-                          ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                   SizedBox(height: media.width * 0.03),
                   TextButton(

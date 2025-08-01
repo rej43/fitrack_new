@@ -120,7 +120,7 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
       // Try to update on server if we have a user ID
       if (updatedUser.id != null) {
         try {
-          await ApiService.updateUserProfile(
+          await ApiService.updateUserProfileLegacy(
             dateOfBirth: dateOfBirth?.toIso8601String(),
             gender: _selectedGender,
             height: _selectedHeight,

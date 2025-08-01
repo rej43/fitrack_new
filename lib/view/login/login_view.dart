@@ -1,14 +1,12 @@
 import 'package:fitrack/common/color_extension.dart';
 import 'package:fitrack/common_widget/round_button.dart';
 import 'package:fitrack/common_widget/round_textfiled.dart';
-// ignore_for_file: unused_import
-import 'package:fitrack/view/home/home_view.dart';
+import 'package:fitrack/services/api_service.dart';
 import 'package:fitrack/view/login/complete_profile_view.dart';
 import 'package:fitrack/view/login/forgot_pass.dart';
 import 'package:flutter/material.dart';
 import 'package:fitrack/view/main_tab/maintab_view.dart';
-import 'package:fitrack/view/login/welcome_view.dart';
-import 'package:fitrack/view/admin_home/admin_dashboard.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -19,6 +17,7 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView> {
   bool _obscureText = true;
+  bool _isLoading = false;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -27,6 +26,84 @@ class _LoginViewState extends State<LoginView> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final googleAuthUrl = ApiService.getGoogleAuthUrl();
+      final uri = Uri.parse(googleAuthUrl);
+      
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        throw Exception('Could not launch Google OAuth');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Google Sign-In failed: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _handleEmailSignIn() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill in all fields'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final response = await ApiService.signin(email: email, password: password);
+      
+      if (response['success'] == true) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const MainTabView(),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message'] ?? 'Login failed'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Login failed: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -117,26 +194,8 @@ class _LoginViewState extends State<LoginView> {
                 ),
                 SizedBox(height: media.width * 0.1),
                 RoundButton(
-                  title: "Login",
-                  onPressed: () {
-                    final email = _emailController.text.trim();
-                    final password = _passwordController.text.trim();
-                    if (email == 'user@fitrackapp.com' && password == 'fit') {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const MainTabView(),
-                        ),
-                      );
-                      return;
-                    }
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CompleteProfileView(),
-                      ),
-                    );
-                  },
+                  title: _isLoading ? "Logging in..." : "Login",
+                  onPressed: _isLoading ? null : () => _handleEmailSignIn(),
                 ),
                 SizedBox(height: media.width * 0.04),
                 Row(
@@ -161,53 +220,40 @@ class _LoginViewState extends State<LoginView> {
                   ],
                 ),
                 SizedBox(height: media.width * 0.04),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: TColor.white,
-                          border: Border.all(
-                            width: 1,
-                            color: TColor.grey.withOpacity(0.4),
-                          ),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Image.asset(
+                GestureDetector(
+                  onTap: _isLoading ? null : () => _handleGoogleSignIn(),
+                  child: Container(
+                    width: double.infinity,
+                    height: 50,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: TColor.white,
+                      border: Border.all(
+                        width: 1,
+                        color: TColor.grey.withOpacity(0.4),
+                      ),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
                           "assets/img/google.png",
                           width: 20,
                           height: 20,
                         ),
-                      ),
-                    ),
-                    SizedBox(width: media.width * 0.04),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: TColor.white,
-                          border: Border.all(
-                            width: 1,
-                            color: TColor.grey.withOpacity(0.4),
+                        const SizedBox(width: 10),
+                        Text(
+                          _isLoading ? "Signing in..." : "Continue with Google",
+                          style: TextStyle(
+                            color: TColor.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
                           ),
-                          borderRadius: BorderRadius.circular(15),
                         ),
-                        child: Image.asset(
-                          "assets/img/facebook.png",
-                          width: 20,
-                          height: 20,
-                        ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
                 SizedBox(height: media.width * 0.04),
                 TextButton(

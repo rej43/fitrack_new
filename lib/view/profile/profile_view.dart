@@ -1,20 +1,16 @@
 import 'package:fitrack/common/color_extension.dart';
-
 import 'package:fitrack/common_widget/setting_row.dart';
 import 'package:fitrack/common_widget/title_subtitle_cell.dart';
 import 'package:fitrack/view/profile/personaldata_view.dart';
 import 'package:flutter/material.dart';
-//ignore_for_file: unused_import
 import 'package:fitrack/common_widget/round_button.dart';
-
-import 'package:fitrack/models/user_model.dart';
-import 'package:fitrack/view/on_boarding/started_view.dart';
 import 'package:fitrack/models/user_model.dart';
 import 'package:fitrack/services/api_service.dart';
 import 'package:fitrack/view/login/login_view.dart';
 import 'package:fitrack/view/main_tab/maintab_view.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'dart:convert';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -25,6 +21,7 @@ class ProfileView extends StatefulWidget {
 
 class _ProfileViewState extends State<ProfileView> {
   UserModel? user;
+  Map<String, dynamic>? currentUser;
   bool isLoading = true;
   File? _profileImage;
   final ImagePicker _picker = ImagePicker();
@@ -51,9 +48,13 @@ class _ProfileViewState extends State<ProfileView> {
 
   Future<void> _loadUserData() async {
     try {
+      // Load both legacy UserModel and new API user data
       final userData = await UserModel.loadFromLocal();
+      final apiUserData = await ApiService.getCurrentUser();
+      
       setState(() {
         user = userData;
+        currentUser = apiUserData;
         isLoading = false;
       });
     } catch (e) {
@@ -69,6 +70,9 @@ class _ProfileViewState extends State<ProfileView> {
     );
     final weightController = TextEditingController(
       text: user?.weight?.toString() ?? '',
+    );
+    final ageController = TextEditingController(
+      text: user?.age?.toString() ?? '',
     );
     String? selectedGender = user?.gender;
 
@@ -140,6 +144,27 @@ class _ProfileViewState extends State<ProfileView> {
                       color: TColor.lightgrey,
                       borderRadius: BorderRadius.circular(15),
                     ),
+                    child: TextField(
+                      controller: ageController,
+                      decoration: InputDecoration(
+                        labelText: 'Age',
+                        labelStyle: TextStyle(color: TColor.grey),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 15,
+                        ),
+                      ),
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(color: TColor.black),
+                    ),
+                  ),
+                  SizedBox(height: 15),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: TColor.lightgrey,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
                     child: DropdownButtonFormField<String>(
                       value: selectedGender,
                       decoration: InputDecoration(
@@ -185,15 +210,22 @@ class _ProfileViewState extends State<ProfileView> {
                   onPressed: () async {
                     final newHeight = double.tryParse(heightController.text);
                     final newWeight = double.tryParse(weightController.text);
+                    final newAge = int.tryParse(ageController.text);
 
                     if (newHeight != null &&
                         newWeight != null &&
-                        selectedGender != null) {
+                        selectedGender != null &&
+                        newAge != null) {
+                      // Calculate date of birth from age
+                      final now = DateTime.now();
+                      final dateOfBirth = DateTime(now.year - newAge, now.month, now.day);
+                      
                       // Update user data
                       final updatedUser = user?.copyWith(
                         height: newHeight,
                         weight: newWeight,
                         gender: selectedGender,
+                        dateOfBirth: dateOfBirth,
                       );
 
                       if (updatedUser != null) {
@@ -241,6 +273,24 @@ class _ProfileViewState extends State<ProfileView> {
             ],
           ),
     );
+  }
+
+  String _getUserName() {
+    // Try to get name from API user data first
+    if (currentUser != null) {
+      if (currentUser!['firstName'] != null && currentUser!['lastName'] != null) {
+        return '${currentUser!['firstName']} ${currentUser!['lastName']}';
+      } else if (currentUser!['name'] != null) {
+        return currentUser!['name'];
+      }
+    }
+    
+    // Fallback to legacy user model
+    if (user?.name != null) {
+      return user!.name!;
+    }
+    
+    return "Loading...";
   }
 
   @override
@@ -352,13 +402,21 @@ class _ProfileViewState extends State<ProfileView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            user?.name ?? "Loading...",
+                            _getUserName(),
                             style: TextStyle(
                               color: TColor.black,
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
+                          if (currentUser != null && currentUser!['email'] != null)
+                            Text(
+                              currentUser!['email'],
+                              style: TextStyle(
+                                color: TColor.grey,
+                                fontSize: 12,
+                              ),
+                            ),
                         ],
                       ),
                     ),

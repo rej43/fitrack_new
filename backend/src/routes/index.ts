@@ -7,7 +7,7 @@ import { Router } from "express";
 const router = Router();
 
 router.use("/auth", authRouter);
-router.use("/health",isAuthenticated,healthRouter);
-router.use("/activity",isAuthenticated,activityRouter);
+router.use("/health", isAuthenticated, healthRouter);
+router.use("/activity", isAuthenticated, activityRouter);
 
 export default router;

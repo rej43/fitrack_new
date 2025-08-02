@@ -16,6 +16,11 @@ authRouter.put("/profile", isAuthenticated, authController.updateProfile);
 authRouter.get("/google", authController.googleAuth);
 authRouter.get("/google/callback", authController.googleCallBack);
 authRouter.get("/google/failure", authController.googleFailure);
+
+// Mobile OAuth routes
+authRouter.post("/google/initiate", authController.initiateGoogleOAuth);
+authRouter.get("/google/status/:sessionId", authController.checkOAuthStatus);
+
 authRouter.get("/logout", authController.logOut);
 
 // Protected route for testing

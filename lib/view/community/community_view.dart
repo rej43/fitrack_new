@@ -143,7 +143,7 @@ class _CommunityViewState extends State<CommunityView> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Container(
+                SizedBox(
                   height: 300,
                   child: posts[index]['comments'].isEmpty
                       ? Center(
@@ -356,7 +356,7 @@ class _CommunityViewState extends State<CommunityView> {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Container(
+                    child: SizedBox(
                       height: 45,
                       child: ElevatedButton(
                         onPressed: () {

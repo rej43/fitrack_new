@@ -3,14 +3,12 @@ import 'package:fitrack/common_widget/setting_row.dart';
 import 'package:fitrack/common_widget/title_subtitle_cell.dart';
 import 'package:fitrack/view/profile/personaldata_view.dart';
 import 'package:flutter/material.dart';
-import 'package:fitrack/common_widget/round_button.dart';
 import 'package:fitrack/models/user_model.dart';
 import 'package:fitrack/services/api_service.dart';
 import 'package:fitrack/view/login/login_view.dart';
 import 'package:fitrack/view/main_tab/maintab_view.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'dart:convert';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});

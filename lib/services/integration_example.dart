@@ -242,6 +242,8 @@ class BackendIntegrationExample {
 // ===== WIDGET INTEGRATION EXAMPLES =====
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -312,6 +314,8 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 class CalorieLoggingWidget extends StatefulWidget {
+  const CalorieLoggingWidget({super.key});
+
   @override
   _CalorieLoggingWidgetState createState() => _CalorieLoggingWidgetState();
 }

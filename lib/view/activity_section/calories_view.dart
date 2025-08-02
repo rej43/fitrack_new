@@ -25,9 +25,7 @@ class FoodLog {
 
   factory FoodLog.fromJson(Map<String, dynamic> json) {
     String? foodName = json['foodName'];
-    if (foodName == null) {
-      foodName = json['food']; // Fallback to old structure
-    }
+    foodName ??= json['food'];
     
     if (foodName == null) {
       throw ArgumentError('Food name is required');
@@ -85,9 +83,7 @@ class _CaloriesViewState extends State<CaloriesView> {
         
         // Check if all required fields are present
         String? foodName = logData['foodName'];
-        if (foodName == null) {
-          foodName = logData['food']; // Fallback to old structure
-        }
+        foodName ??= logData['food'];
         
         if (foodName != null && 
             logData['calories'] != null && 
@@ -118,9 +114,7 @@ class _CaloriesViewState extends State<CaloriesView> {
           
           // Handle both old and new data structures
           String? foodName = logData['foodName'];
-          if (foodName == null) {
-            foodName = logData['food']; // Fallback to old structure
-          }
+          foodName ??= logData['food'];
           
           if (foodName == null) {
             continue; // Skip entries without food name

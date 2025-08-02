@@ -56,26 +56,37 @@ class _LoginViewState extends State<LoginView> {
       return;
     }
 
-    try {
-      setState(() {
-        _isLoading = true;
-      });
+    setState(() {
+      _isLoading = true;
+    });
 
-      final response = await ApiService.signin(email: email, password: password);
+    try {
+      final response = await ApiService.signin(
+        email: email,
+        password: password,
+      );
+
+      // Show success message
+      String message = response['message'] ?? 'Login successful!';
+      if (response['isLocalMode'] == true) {
+        message += ' (Offline Mode)';
+      }
       
-      if (response['success'] == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+      // Navigate to main screen after a short delay
+      await Future.delayed(const Duration(seconds: 1));
+      
+      if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => const MainTabView(),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(response['message'] ?? 'Login failed'),
-            backgroundColor: Colors.red,
-          ),
+          MaterialPageRoute(builder: (context) => const MainTabView()),
         );
       }
     } catch (e) {
@@ -86,9 +97,11 @@ class _LoginViewState extends State<LoginView> {
         ),
       );
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 

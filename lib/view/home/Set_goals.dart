@@ -1,5 +1,4 @@
 import 'package:fitrack/common/color_extension.dart';
-import 'package:fitrack/common_widget/round_button.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -369,7 +368,7 @@ class _SetGoalsScreenState extends State<SetGoalsView> {
                             final index = entry.key;
                             final goal = entry.value;
                             return _buildGoalItem(goal, index);
-                          }).toList(),
+                          }),
                         ],
                         
                         SizedBox(height: 100), // Bottom padding

@@ -36,31 +36,18 @@ class _SignUpViewState extends State<SignUpView> {
   }
 
   Future<void> _handleGoogleSignUp() async {
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-
-      final googleAuthUrl = ApiService.getGoogleAuthUrl();
-      final uri = Uri.parse(googleAuthUrl);
-      
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      } else {
-        throw Exception('Could not launch Google OAuth');
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Google Sign-Up failed: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    // For now, show a message that Google OAuth is not available
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Google Sign-Up is not available yet. Please use email/password registration.'),
+        backgroundColor: Colors.orange,
+        duration: Duration(seconds: 3),
+      ),
+    );
+    
+    // TODO: Implement proper Google OAuth for mobile
+    // The current implementation has URL launcher issues
+    // Consider using google_sign_in package for proper mobile OAuth
   }
 
   Future<void> _handleEmailSignUp() async {
@@ -262,7 +249,7 @@ class _SignUpViewState extends State<SignUpView> {
                   SizedBox(height: media.width * 0.05),
                   RoundButton(
                     title: _isLoading ? "Registering..." : "Register",
-                    onPressed: _isLoading ? null : () => _handleEmailSignUp(),
+                    onPressed: _isLoading ? () {} : () => _handleEmailSignUp(),
                   ),
                   SizedBox(height: media.width * 0.03),
                   Row(
@@ -287,7 +274,7 @@ class _SignUpViewState extends State<SignUpView> {
                   ),
                   SizedBox(height: media.width * 0.03),
                   GestureDetector(
-                    onTap: _isLoading ? null : () => _handleGoogleSignUp(),
+                    onTap: _isLoading ? () {} : () => _handleGoogleSignUp(),
                     child: Container(
                       width: double.infinity,
                       height: 50,

@@ -33,10 +33,10 @@ class _HomeViewState extends State<HomeView> {
   int _waterGoal = 2000;
   String _sleepDuration = '0h 0m';
   int _todayCalories = 0;
-  int _calorieGoal = 1000; // Total calorie goal is 1000 kcal
-  List<Map<String, dynamic>> _waterTimeline = [];
-  List<Map<String, dynamic>> _calorieTimeline = [];
-  List<Map<String, dynamic>> _dailyGoals = [];
+  final int _calorieGoal = 1000; // Total calorie goal is 1000 kcal
+  final List<Map<String, dynamic>> _waterTimeline = [];
+  final List<Map<String, dynamic>> _calorieTimeline = [];
+  final List<Map<String, dynamic>> _dailyGoals = [];
   int _completedGoals = 0;
   int _totalGoals = 0;
 
@@ -81,9 +81,7 @@ class _HomeViewState extends State<HomeView> {
         
         // Check if all required fields are present
         String? foodName = logData['foodName'];
-        if (foodName == null) {
-          foodName = logData['food']; // Fallback to old structure
-        }
+        foodName ??= logData['food'];
         
         if (foodName != null && 
             logData['calories'] != null && 
@@ -218,9 +216,7 @@ class _HomeViewState extends State<HomeView> {
           
           // Handle both old and new data structures
           String? foodName = logData['foodName'];
-          if (foodName == null) {
-            foodName = logData['food']; // Fallback to old structure
-          }
+          foodName ??= logData['food'];
           
           if (foodName == null) {
             continue; // Skip entries without food name
@@ -630,7 +626,7 @@ class _HomeViewState extends State<HomeView> {
                         ),
                         SizedBox(height: 8),
                         if (_dailyGoals.isNotEmpty) ...[
-                          Container(
+                          SizedBox(
                             height: 60,
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
@@ -1030,7 +1026,7 @@ class _HomeViewState extends State<HomeView> {
                                                 valueColor: AlwaysStoppedAnimation<Color>(TColor.primaryColor1),
                                               ),
                                               // Inner donut chart (additional progress indicator)
-                                              Container(
+                                              SizedBox(
                                                 width: media.width * 0.18,
                                                 height: media.width * 0.18,
                                                 child: CircularProgressIndicator(

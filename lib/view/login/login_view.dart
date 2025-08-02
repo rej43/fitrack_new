@@ -2,7 +2,6 @@ import 'package:fitrack/common/color_extension.dart';
 import 'package:fitrack/common_widget/round_button.dart';
 import 'package:fitrack/common_widget/round_textfiled.dart';
 import 'package:fitrack/services/api_service.dart';
-import 'package:fitrack/view/login/complete_profile_view.dart';
 import 'package:fitrack/view/login/forgot_pass.dart';
 import 'package:flutter/material.dart';
 import 'package:fitrack/view/main_tab/maintab_view.dart';
@@ -29,31 +28,18 @@ class _LoginViewState extends State<LoginView> {
   }
 
   Future<void> _handleGoogleSignIn() async {
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-
-      final googleAuthUrl = ApiService.getGoogleAuthUrl();
-      final uri = Uri.parse(googleAuthUrl);
-      
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      } else {
-        throw Exception('Could not launch Google OAuth');
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Google Sign-In failed: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    // For now, show a message that Google OAuth is not available
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Google Sign-In is not available yet. Please use email/password login.'),
+        backgroundColor: Colors.orange,
+        duration: Duration(seconds: 3),
+      ),
+    );
+    
+    // TODO: Implement proper Google OAuth for mobile
+    // The current implementation has URL launcher issues
+    // Consider using google_sign_in package for proper mobile OAuth
   }
 
   Future<void> _handleEmailSignIn() async {
@@ -195,7 +181,7 @@ class _LoginViewState extends State<LoginView> {
                 SizedBox(height: media.width * 0.1),
                 RoundButton(
                   title: _isLoading ? "Logging in..." : "Login",
-                  onPressed: _isLoading ? null : () => _handleEmailSignIn(),
+                  onPressed: _isLoading ? () {} : () => _handleEmailSignIn(),
                 ),
                 SizedBox(height: media.width * 0.04),
                 Row(
@@ -221,7 +207,7 @@ class _LoginViewState extends State<LoginView> {
                 ),
                 SizedBox(height: media.width * 0.04),
                 GestureDetector(
-                  onTap: _isLoading ? null : () => _handleGoogleSignIn(),
+                  onTap: _isLoading ? () {} : () => _handleGoogleSignIn(),
                   child: Container(
                     width: double.infinity,
                     height: 50,

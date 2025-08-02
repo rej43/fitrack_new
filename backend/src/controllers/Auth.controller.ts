@@ -49,6 +49,8 @@ export class AuthController {
     public googleCallBack = (req: Request, res: Response, next: NextFunction) => {
         passport.authenticate("google", { session: false }, async (err: any, user: any) => {
             if (err) {
+                // Set session state to failed
+                req.session.oauthState = 'failed';
                 return res.status(500).json({
                     success: false,
                     message: "Google authentication failed",
@@ -57,6 +59,8 @@ export class AuthController {
             }
 
             if (!user) {
+                // Set session state to failed
+                req.session.oauthState = 'failed';
                 return res.status(401).json({
                     success: false,
                     message: "Google authentication failed"
@@ -71,19 +75,30 @@ export class AuthController {
                     { expiresIn: '7d' }
                 );
 
+                // Store user and token in session for mobile OAuth
+                req.session.user = {
+                    id: user._id,
+                    name: user.firstName + ' ' + user.lastName,
+                    email: user.email,
+                    googleId: user.googleId
+                };
+                req.session.token = token;
+                req.session.oauthState = 'completed';
+
                 // Return success with token
                 res.status(200).json({
                     success: true,
                     message: "Google authentication successful",
                     user: {
                         id: user._id,
-                        name: user.name,
+                        name: user.firstName + ' ' + user.lastName,
                         email: user.email,
                         googleId: user.googleId
                     },
                     token
                 });
             } catch (error) {
+                req.session.oauthState = 'failed';
                 res.status(500).json({
                     success: false,
                     message: "Token generation failed",
@@ -99,6 +114,66 @@ export class AuthController {
             message: "Failed to authenticate with Google"
         });
     }
+
+    // Mobile OAuth methods
+    public initiateGoogleOAuth = asyncHandler(async (req: Request, res: Response) => {
+        // Generate a unique session ID for this OAuth attempt
+        const sessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        
+        // Store the session ID in the session
+        req.session.oauthSessionId = sessionId;
+        req.session.oauthState = 'pending';
+        
+        // Return the OAuth URL and session ID
+        const oauthUrl = `${env.CLIENT_URL}/api/v1/auth/google?sessionId=${sessionId}`;
+        
+        return res.status(200).json({
+            success: true,
+            sessionId: sessionId,
+            oauthUrl: oauthUrl,
+            message: "OAuth session initiated"
+        });
+    });
+
+    public checkOAuthStatus = asyncHandler(async (req: Request, res: Response) => {
+        const { sessionId } = req.params;
+        
+        // Check if the session exists and has completed OAuth
+        if (req.session.oauthSessionId === sessionId && req.session.oauthState === 'completed') {
+            // OAuth completed successfully
+            const user = req.session.user;
+            const token = req.session.token;
+            
+            // Clear the OAuth session data
+            delete req.session.oauthSessionId;
+            delete req.session.oauthState;
+            delete req.session.user;
+            delete req.session.token;
+            
+            return res.status(200).json({
+                success: true,
+                message: "OAuth completed successfully",
+                user: user,
+                token: token
+            });
+        } else if (req.session.oauthSessionId === sessionId && req.session.oauthState === 'failed') {
+            // OAuth failed
+            delete req.session.oauthSessionId;
+            delete req.session.oauthState;
+            
+            return res.status(401).json({
+                success: false,
+                message: "OAuth authentication failed"
+            });
+        } else {
+            // OAuth still pending
+            return res.status(200).json({
+                success: false,
+                message: "OAuth still pending",
+                status: 'pending'
+            });
+        }
+    });
 
     public protectedRoute = (req: Request, res: Response) => {
         res.json({

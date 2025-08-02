@@ -178,10 +178,14 @@ class ApiService {
 
   // Google OAuth
   static String getGoogleAuthUrl() {
+    // For mobile apps, we need to use a different approach
+    // This will redirect to the backend which will handle the OAuth flow
     return '$apiUrl/auth/google';
   }
 
   static Future<Map<String, dynamic>> googleAuthCallback(String code) async {
+    // For mobile apps, we'll handle the OAuth flow differently
+    // This method will be called after the user completes OAuth
     final response = await _makeRequest('/auth/google/callback', 'GET');
     
     // Save token and user data if provided in response
@@ -194,6 +198,28 @@ class ApiService {
     }
 
     return response;
+  }
+
+  // New method for mobile OAuth flow
+  static Future<Map<String, dynamic>> initiateGoogleOAuth() async {
+    try {
+      // For mobile apps, we'll use a simplified approach
+      // This will create a session and return a URL that can be opened in a browser
+      final response = await _makeRequest('/auth/google/initiate', 'POST');
+      return response;
+    } catch (e) {
+      throw Exception('Failed to initiate Google OAuth: $e');
+    }
+  }
+
+  // Method to check OAuth status
+  static Future<Map<String, dynamic>> checkOAuthStatus(String sessionId) async {
+    try {
+      final response = await _makeRequest('/auth/google/status/$sessionId', 'GET');
+      return response;
+    } catch (e) {
+      throw Exception('Failed to check OAuth status: $e');
+    }
   }
 
   // ===== HEALTH DATA APIs =====
@@ -215,7 +241,7 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> getHealthDetails() async {
-    return await _makeRequest('/health/getHealthDetauls', 'GET');
+    return await _makeRequest('/health/getHealthDetails', 'GET');
   }
 
   static Future<Map<String, dynamic>> updateHealthRecord({

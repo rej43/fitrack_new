@@ -6,7 +6,7 @@ class ApiService {
   // Updated to match your backend configuration
   static const String baseUrl = 'http://localhost:4000/api/v1';
   static const String baseUrlEmulator = 'http://10.0.2.2:4000/api/v1';
-  
+
   // Use emulator URL for Android emulator, localhost for iOS simulator
   static String get apiUrl {
     // For physical device or emulator, use localhost
@@ -38,18 +38,15 @@ class ApiService {
   }) async {
     final url = Uri.parse('$apiUrl$endpoint');
     final token = await getToken();
-    
-    final requestHeaders = {
-      'Content-Type': 'application/json',
-      ...?headers,
-    };
+
+    final requestHeaders = {'Content-Type': 'application/json', ...?headers};
 
     if (token != null) {
       requestHeaders['Authorization'] = 'Bearer $token';
     }
 
     http.Response response;
-    
+
     try {
       switch (method.toUpperCase()) {
         case 'GET':
@@ -77,7 +74,7 @@ class ApiService {
       }
 
       final responseData = jsonDecode(response.body);
-      
+
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return responseData;
       } else {
@@ -89,7 +86,7 @@ class ApiService {
   }
 
   // ===== AUTHENTICATION APIs =====
-  
+
   static Future<Map<String, dynamic>> signup({
     required String firstName,
     required String lastName,
@@ -98,18 +95,22 @@ class ApiService {
   }) async {
     try {
       // Try backend first
-      final response = await _makeRequest('/auth/signup', 'POST', body: {
-        'firstName': firstName,
-        'lastName': lastName,
-        'email': email,
-        'password': password,
-      });
+      final response = await _makeRequest(
+        '/auth/signup',
+        'POST',
+        body: {
+          'firstName': firstName,
+          'lastName': lastName,
+          'email': email,
+          'password': password,
+        },
+      );
 
       // Save token and user data if provided in response
       if (response['token'] != null) {
         await saveToken(response['token']);
       }
-      
+
       if (response['user'] != null) {
         await _saveUserData(response['user']);
       }
@@ -118,11 +119,12 @@ class ApiService {
     } catch (e) {
       // Backend failed, use local bypass
       print('Backend signup failed, using local bypass: $e');
-      
+
       // Generate a local token
-      final localToken = 'local_${DateTime.now().millisecondsSinceEpoch}_${email.hashCode}';
+      final localToken =
+          'local_${DateTime.now().millisecondsSinceEpoch}_${email.hashCode}';
       await saveToken(localToken);
-      
+
       // Save user data locally
       final userData = {
         'id': 'local_${email.hashCode}',
@@ -133,10 +135,10 @@ class ApiService {
         'createdAt': DateTime.now().toIso8601String(),
       };
       await _saveUserData(userData);
-      
+
       return {
         'success': true,
-        'message': 'User signed up successfully (Local Mode)',
+        'message': 'User signed up successfully',
         'token': localToken,
         'user': userData,
         'isLocalMode': true,
@@ -150,16 +152,17 @@ class ApiService {
   }) async {
     try {
       // Try backend first
-      final response = await _makeRequest('/auth/signin', 'POST', body: {
-        'email': email,
-        'password': password,
-      });
+      final response = await _makeRequest(
+        '/auth/signin',
+        'POST',
+        body: {'email': email, 'password': password},
+      );
 
       // Save token and user data if provided in response
       if (response['token'] != null) {
         await saveToken(response['token']);
       }
-      
+
       if (response['user'] != null) {
         await _saveUserData(response['user']);
       }
@@ -168,21 +171,22 @@ class ApiService {
     } catch (e) {
       // Backend failed, check if user exists locally
       print('Backend signin failed, checking local bypass: $e');
-      
+
       final prefs = await SharedPreferences.getInstance();
       final userDataString = prefs.getString('user_data');
-      
+
       if (userDataString != null) {
         try {
           final userData = jsonDecode(userDataString);
           if (userData['email'] == email) {
             // User exists locally, generate new token
-            final localToken = 'local_${DateTime.now().millisecondsSinceEpoch}_${email.hashCode}';
+            final localToken =
+                'local_${DateTime.now().millisecondsSinceEpoch}_${email.hashCode}';
             await saveToken(localToken);
-            
+
             return {
               'success': true,
-              'message': 'User signed in successfully (Local Mode)',
+              'message': 'User signed in successfully',
               'token': localToken,
               'user': userData,
               'isLocalMode': true,
@@ -192,11 +196,12 @@ class ApiService {
           print('Error parsing local user data: $parseError');
         }
       }
-      
+
       // No local user found, create one for bypass
-      final localToken = 'local_${DateTime.now().millisecondsSinceEpoch}_${email.hashCode}';
+      final localToken =
+          'local_${DateTime.now().millisecondsSinceEpoch}_${email.hashCode}';
       await saveToken(localToken);
-      
+
       final userData = {
         'id': 'local_${email.hashCode}',
         'firstName': 'User',
@@ -206,10 +211,10 @@ class ApiService {
         'createdAt': DateTime.now().toIso8601String(),
       };
       await _saveUserData(userData);
-      
+
       return {
         'success': true,
-        'message': 'User signed in successfully (Local Mode)',
+        'message': 'User signed in successfully',
         'token': localToken,
         'user': userData,
         'isLocalMode': true,
@@ -243,11 +248,15 @@ class ApiService {
     String? lastName,
     String? email,
   }) async {
-    final response = await _makeRequest('/auth/profile', 'PUT', body: {
-      if (firstName != null) 'firstName': firstName,
-      if (lastName != null) 'lastName': lastName,
-      if (email != null) 'email': email,
-    });
+    final response = await _makeRequest(
+      '/auth/profile',
+      'PUT',
+      body: {
+        if (firstName != null) 'firstName': firstName,
+        if (lastName != null) 'lastName': lastName,
+        if (email != null) 'email': email,
+      },
+    );
 
     // Update local user data if successful
     if (response['success'] == true && response['user'] != null) {
@@ -268,12 +277,12 @@ class ApiService {
     // For mobile apps, we'll handle the OAuth flow differently
     // This method will be called after the user completes OAuth
     final response = await _makeRequest('/auth/google/callback', 'GET');
-    
+
     // Save token and user data if provided in response
     if (response['token'] != null) {
       await saveToken(response['token']);
     }
-    
+
     if (response['user'] != null) {
       await _saveUserData(response['user']);
     }
@@ -296,7 +305,10 @@ class ApiService {
   // Method to check OAuth status
   static Future<Map<String, dynamic>> checkOAuthStatus(String sessionId) async {
     try {
-      final response = await _makeRequest('/auth/google/status/$sessionId', 'GET');
+      final response = await _makeRequest(
+        '/auth/google/status/$sessionId',
+        'GET',
+      );
       return response;
     } catch (e) {
       throw Exception('Failed to check OAuth status: $e');
@@ -304,7 +316,7 @@ class ApiService {
   }
 
   // ===== HEALTH DATA APIs =====
-  
+
   static Future<Map<String, dynamic>> createHealthData({
     required String gender,
     required double heightInCM,
@@ -313,17 +325,21 @@ class ApiService {
     required String healthGoal,
   }) async {
     try {
-      return await _makeRequest('/health/createHealthData', 'POST', body: {
-        'gender': gender.toLowerCase(),
-        'heightInCM': heightInCM,
-        'weightInKG': weightInKG,
-        'bodyType': bodyType.toLowerCase(),
-        'healthGoal': healthGoal.toLowerCase(),
-      });
+      return await _makeRequest(
+        '/health/createHealthData',
+        'POST',
+        body: {
+          'gender': gender.toLowerCase(),
+          'heightInCM': heightInCM,
+          'weightInKG': weightInKG,
+          'bodyType': bodyType.toLowerCase(),
+          'healthGoal': healthGoal.toLowerCase(),
+        },
+      );
     } catch (e) {
       // Backend failed, save locally
       print('Backend health data creation failed, saving locally: $e');
-      
+
       final healthData = {
         'gender': gender.toLowerCase(),
         'heightInCM': heightInCM,
@@ -333,14 +349,14 @@ class ApiService {
         'createdAt': DateTime.now().toIso8601String(),
         'isLocalData': true,
       };
-      
+
       // Save to local storage
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('health_data', jsonEncode(healthData));
-      
+
       return {
         'success': true,
-        'message': 'Health data created successfully (Local Mode)',
+        'message': 'Health data created successfully',
         'data': healthData,
         'isLocalMode': true,
       };
@@ -353,23 +369,19 @@ class ApiService {
     } catch (e) {
       // Backend failed, get from local storage
       print('Backend health data fetch failed, getting from local: $e');
-      
+
       final prefs = await SharedPreferences.getInstance();
       final healthDataString = prefs.getString('health_data');
-      
+
       if (healthDataString != null) {
         try {
           final healthData = jsonDecode(healthDataString);
-          return {
-            'success': true,
-            'data': healthData,
-            'isLocalMode': true,
-          };
+          return {'success': true, 'data': healthData, 'isLocalMode': true};
         } catch (parseError) {
           print('Error parsing local health data: $parseError');
         }
       }
-      
+
       return {
         'success': false,
         'message': 'No health data found',
@@ -386,17 +398,21 @@ class ApiService {
     required String healthGoal,
   }) async {
     try {
-      return await _makeRequest('/health/updateHealthRecord', 'PUT', body: {
-        'gender': gender.toLowerCase(),
-        'heightInCM': heightInCM,
-        'weightInKG': weightInKG,
-        'bodyType': bodyType.toLowerCase(),
-        'healthGoal': healthGoal.toLowerCase(),
-      });
+      return await _makeRequest(
+        '/health/updateHealthRecord',
+        'PUT',
+        body: {
+          'gender': gender.toLowerCase(),
+          'heightInCM': heightInCM,
+          'weightInKG': weightInKG,
+          'bodyType': bodyType.toLowerCase(),
+          'healthGoal': healthGoal.toLowerCase(),
+        },
+      );
     } catch (e) {
       // Backend failed, update locally
       print('Backend health data update failed, updating locally: $e');
-      
+
       final healthData = {
         'gender': gender.toLowerCase(),
         'heightInCM': heightInCM,
@@ -406,14 +422,14 @@ class ApiService {
         'updatedAt': DateTime.now().toIso8601String(),
         'isLocalData': true,
       };
-      
+
       // Save to local storage
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('health_data', jsonEncode(healthData));
-      
+
       return {
         'success': true,
-        'message': 'Health data updated successfully (Local Mode)',
+        'message': 'Health data updated successfully',
         'data': healthData,
         'isLocalMode': true,
       };
@@ -421,7 +437,7 @@ class ApiService {
   }
 
   // ===== ACTIVITY APIs =====
-  
+
   static Future<Map<String, dynamic>> logActivity({
     required DateTime date,
     double? sleepHours,
@@ -429,10 +445,8 @@ class ApiService {
     double? waterIntake,
     double? foodCalories,
   }) async {
-    final body = <String, dynamic>{
-      'date': date.toIso8601String(),
-    };
-    
+    final body = <String, dynamic>{'date': date.toIso8601String()};
+
     if (sleepHours != null) body['sleepHours'] = sleepHours;
     if (steps != null) body['steps'] = steps;
     if (waterIntake != null) body['waterIntake'] = waterIntake;
@@ -443,26 +457,28 @@ class ApiService {
     } catch (e) {
       // Backend failed, save locally
       print('Backend activity logging failed, saving locally: $e');
-      
+
       final activityData = {
         ...body,
         'loggedAt': DateTime.now().toIso8601String(),
         'isLocalData': true,
       };
-      
+
       // Save to local storage
       final prefs = await SharedPreferences.getInstance();
       final existingActivitiesString = prefs.getString('activity_data') ?? '[]';
       final existingActivities = List<Map<String, dynamic>>.from(
-        jsonDecode(existingActivitiesString).map((x) => Map<String, dynamic>.from(x))
+        jsonDecode(
+          existingActivitiesString,
+        ).map((x) => Map<String, dynamic>.from(x)),
       );
-      
+
       existingActivities.add(activityData);
       await prefs.setString('activity_data', jsonEncode(existingActivities));
-      
+
       return {
         'success': true,
-        'message': 'Activity logged successfully (Local Mode)',
+        'message': 'Activity logged successfully',
         'data': activityData,
         'isLocalMode': true,
       };
@@ -475,24 +491,16 @@ class ApiService {
     } catch (e) {
       // Backend failed, get from local storage
       print('Backend activity fetch failed, getting from local: $e');
-      
+
       final prefs = await SharedPreferences.getInstance();
       final activityDataString = prefs.getString('activity_data') ?? '[]';
-      
+
       try {
         final activityData = jsonDecode(activityDataString);
-        return {
-          'success': true,
-          'data': activityData,
-          'isLocalMode': true,
-        };
+        return {'success': true, 'data': activityData, 'isLocalMode': true};
       } catch (parseError) {
         print('Error parsing local activity data: $parseError');
-        return {
-          'success': true,
-          'data': [],
-          'isLocalMode': true,
-        };
+        return {'success': true, 'data': [], 'isLocalMode': true};
       }
     }
   }
@@ -504,10 +512,8 @@ class ApiService {
     double? waterIntake,
     double? foodCalories,
   }) async {
-    final body = <String, dynamic>{
-      'date': date.toIso8601String(),
-    };
-    
+    final body = <String, dynamic>{'date': date.toIso8601String()};
+
     if (sleepHours != null) body['sleepHours'] = sleepHours;
     if (steps != null) body['steps'] = steps;
     if (waterIntake != null) body['waterIntake'] = waterIntake;
@@ -517,7 +523,7 @@ class ApiService {
   }
 
   // ===== UTILITY METHODS =====
-  
+
   static Future<bool> isAuthenticated() async {
     final token = await getToken();
     return token != null;
@@ -534,11 +540,13 @@ class ApiService {
   static Future<Map<String, dynamic>> getConnectionStatus() async {
     try {
       // Try to reach the backend
-      final response = await http.get(
-        Uri.parse('http://localhost:4000/stats'),
-        headers: {'Content-Type': 'application/json'},
-      ).timeout(const Duration(seconds: 5));
-      
+      final response = await http
+          .get(
+            Uri.parse('http://localhost:4000/stats'),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(const Duration(seconds: 5));
+
       if (response.statusCode == 200) {
         return {
           'connected': true,
@@ -581,7 +589,7 @@ class ApiService {
     List<String>? fitnessGoals,
   }) async {
     final body = <String, dynamic>{};
-    
+
     if (name != null) body['name'] = name;
     if (dateOfBirth != null) body['dateOfBirth'] = dateOfBirth;
     if (gender != null) body['gender'] = gender.toLowerCase();
@@ -591,10 +599,7 @@ class ApiService {
     if (fitnessGoals != null) body['fitnessGoals'] = fitnessGoals;
 
     // For now, just return success since we don't have this endpoint in the backend
-    return {
-      'success': true,
-      'message': 'Profile updated successfully',
-    };
+    return {'success': true, 'message': 'Profile updated successfully'};
   }
 
   static Future<void> logout() async {
@@ -615,19 +620,21 @@ class ApiService {
   }
 
   // ===== CONVENIENCE METHODS FOR FLUTTER INTEGRATION =====
-  
+
   // Method to sync local calorie data with backend
-  static Future<Map<String, dynamic>> syncCalorieData(List<Map<String, dynamic>> localCalories) async {
+  static Future<Map<String, dynamic>> syncCalorieData(
+    List<Map<String, dynamic>> localCalories,
+  ) async {
     try {
       // Get today's date
       final today = DateTime.now();
-      
+
       // Calculate total calories for today
       int totalCalories = 0;
       for (final calorie in localCalories) {
         totalCalories += calorie['calories'] as int;
       }
-      
+
       // Log activity with calorie data
       return await logActivity(
         date: today,
@@ -639,31 +646,32 @@ class ApiService {
   }
 
   // Method to sync local water data with backend
-  static Future<Map<String, dynamic>> syncWaterData(List<Map<String, dynamic>> localWater) async {
+  static Future<Map<String, dynamic>> syncWaterData(
+    List<Map<String, dynamic>> localWater,
+  ) async {
     try {
       final today = DateTime.now();
-      
+
       // Calculate total water intake for today
       double totalWater = 0;
       for (final water in localWater) {
         totalWater += water['ml'] as double;
       }
-      
+
       // Log activity with water data
-      return await logActivity(
-        date: today,
-        waterIntake: totalWater,
-      );
+      return await logActivity(date: today, waterIntake: totalWater);
     } catch (e) {
       throw Exception('Failed to sync water data: $e');
     }
   }
 
   // Method to sync local sleep data with backend
-  static Future<Map<String, dynamic>> syncSleepData(String sleepDuration) async {
+  static Future<Map<String, dynamic>> syncSleepData(
+    String sleepDuration,
+  ) async {
     try {
       final today = DateTime.now();
-      
+
       // Parse sleep duration (format: "8h 30m")
       double sleepHours = 0;
       final parts = sleepDuration.split(' ');
@@ -674,12 +682,9 @@ class ApiService {
           sleepHours += double.parse(part.replaceAll('m', '')) / 60;
         }
       }
-      
+
       // Log activity with sleep data
-      return await logActivity(
-        date: today,
-        sleepHours: sleepHours,
-      );
+      return await logActivity(date: today, sleepHours: sleepHours);
     } catch (e) {
       throw Exception('Failed to sync sleep data: $e');
     }
@@ -689,14 +694,11 @@ class ApiService {
   static Future<Map<String, dynamic>> syncStepsData(int steps) async {
     try {
       final today = DateTime.now();
-      
+
       // Log activity with steps data
-      return await logActivity(
-        date: today,
-        steps: steps,
-      );
+      return await logActivity(date: today, steps: steps);
     } catch (e) {
       throw Exception('Failed to sync steps data: $e');
     }
   }
-} 
+}

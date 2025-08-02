@@ -5,7 +5,6 @@ import 'package:fitrack/services/api_service.dart';
 import 'package:fitrack/view/login/complete_profile_view.dart';
 import 'package:fitrack/view/login/login_view.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
@@ -39,12 +38,14 @@ class _SignUpViewState extends State<SignUpView> {
     // For now, show a message that Google OAuth is not available
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Google Sign-Up is not available yet. Please use email/password registration.'),
+        content: Text(
+          'Google Sign-Up is not available yet. Please use email/password registration.',
+        ),
         backgroundColor: Colors.orange,
         duration: Duration(seconds: 3),
       ),
     );
-    
+
     // TODO: Implement proper Google OAuth for mobile
     // The current implementation has URL launcher issues
     // Consider using google_sign_in package for proper mobile OAuth
@@ -82,7 +83,7 @@ class _SignUpViewState extends State<SignUpView> {
       if (response['isLocalMode'] == true) {
         message += ' (Offline Mode)';
       }
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message),
@@ -93,7 +94,7 @@ class _SignUpViewState extends State<SignUpView> {
 
       // Navigate to complete profile after a short delay
       await Future.delayed(const Duration(seconds: 1));
-      
+
       if (mounted) {
         Navigator.pushReplacement(
           context,
@@ -301,7 +302,9 @@ class _SignUpViewState extends State<SignUpView> {
                           ),
                           const SizedBox(width: 10),
                           Text(
-                            _isLoading ? "Signing up..." : "Continue with Google",
+                            _isLoading
+                                ? "Signing up..."
+                                : "Continue with Google",
                             style: TextStyle(
                               color: TColor.black,
                               fontSize: 16,

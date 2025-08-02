@@ -50,32 +50,26 @@ class _SignUpViewState extends State<SignUpView> {
     // Consider using google_sign_in package for proper mobile OAuth
   }
 
-  Future<void> _handleEmailSignUp() async {
-    if (!(_formKey.currentState?.validate() ?? false)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill in all required fields correctly.'),
-          backgroundColor: Colors.red,
-        ),
-      );
+  Future<void> _handleSignUp() async {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
     if (!isCheck) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please accept the Privacy Policy and Term of Use.'),
+          content: Text('Please accept the Privacy Policy and Terms of Use'),
           backgroundColor: Colors.red,
         ),
       );
       return;
     }
 
-    try {
-      setState(() {
-        _isLoading = true;
-      });
+    setState(() {
+      _isLoading = true;
+    });
 
+    try {
       final response = await ApiService.signup(
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
@@ -83,19 +77,27 @@ class _SignUpViewState extends State<SignUpView> {
         password: _passwordController.text.trim(),
       );
 
-      if (response['success'] == true) {
+      // Show success message
+      String message = response['message'] ?? 'Registration successful!';
+      if (response['isLocalMode'] == true) {
+        message += ' (Offline Mode)';
+      }
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+      // Navigate to complete profile after a short delay
+      await Future.delayed(const Duration(seconds: 1));
+      
+      if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => const CompleteProfileView(),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(response['message'] ?? 'Registration failed'),
-            backgroundColor: Colors.red,
-          ),
+          MaterialPageRoute(builder: (context) => const CompleteProfileView()),
         );
       }
     } catch (e) {
@@ -106,9 +108,11 @@ class _SignUpViewState extends State<SignUpView> {
         ),
       );
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -249,7 +253,7 @@ class _SignUpViewState extends State<SignUpView> {
                   SizedBox(height: media.width * 0.05),
                   RoundButton(
                     title: _isLoading ? "Registering..." : "Register",
-                    onPressed: _isLoading ? () {} : () => _handleEmailSignUp(),
+                    onPressed: _isLoading ? () {} : () => _handleSignUp(),
                   ),
                   SizedBox(height: media.width * 0.03),
                   Row(

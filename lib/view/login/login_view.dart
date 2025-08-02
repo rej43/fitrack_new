@@ -5,7 +5,6 @@ import 'package:fitrack/services/api_service.dart';
 import 'package:fitrack/view/login/forgot_pass.dart';
 import 'package:flutter/material.dart';
 import 'package:fitrack/view/main_tab/maintab_view.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -31,12 +30,14 @@ class _LoginViewState extends State<LoginView> {
     // For now, show a message that Google OAuth is not available
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Google Sign-In is not available yet. Please use email/password login.'),
+        content: Text(
+          'Google Sign-In is not available yet. Please use email/password login.',
+        ),
         backgroundColor: Colors.orange,
         duration: Duration(seconds: 3),
       ),
     );
-    
+
     // TODO: Implement proper Google OAuth for mobile
     // The current implementation has URL launcher issues
     // Consider using google_sign_in package for proper mobile OAuth
@@ -67,11 +68,11 @@ class _LoginViewState extends State<LoginView> {
       );
 
       // Show success message
-      String message = response['message'] ?? 'Login successful!';
+      String message = response['message'] ?? 'Login';
       if (response['isLocalMode'] == true) {
-        message += ' (Offline Mode)';
+        message += ' Successful!';
       }
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message),
@@ -82,7 +83,7 @@ class _LoginViewState extends State<LoginView> {
 
       // Navigate to main screen after a short delay
       await Future.delayed(const Duration(seconds: 1));
-      
+
       if (mounted) {
         Navigator.pushReplacement(
           context,

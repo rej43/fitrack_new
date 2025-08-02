@@ -27,7 +27,7 @@ I've implemented a comprehensive bypass mechanism that allows the FiTrack app to
 ### **Signup Process:**
 1. **Try Backend First**: Attempts to register with backend
 2. **Fallback to Local**: If backend fails, saves user data locally
-3. **Success Message**: Shows "User signed up successfully (Local Mode)"
+3. **Success Message**: Shows "User signed up successfully"
 4. **Navigation**: Proceeds to next screen normally
 
 ### **Login Process:**

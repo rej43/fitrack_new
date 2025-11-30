@@ -34,6 +34,7 @@ Before you begin, ensure you have the following installed on your system:
 
 * [Flutter SDK](https://flutter.dev/docs/get-started/install)
 * [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [Xcode](https://developer.apple.com/xcode/) Or [Visual Studio Code](https://code.visualstudio.com/Download)
 
 ### Installation
 

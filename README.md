@@ -86,9 +86,17 @@ See `backend/SETUP.md` for full backend configuration.
 
 ## Screenshots
 
-| Splash | Complete Profile |
-|--------|------------------|
-| ![Splash](Screenshots/StartedView.png) | ![Profile](Screenshots/CompleteProfile.png) |
+| Onboarding | Login | Complete Profile |
+|------------|-------|------------------|
+| ![Onboarding](Screenshots/Onboarding.png) | ![Login](Screenshots/Login.png) | ![Complete Profile](Screenshots/CompleteProfile.png) |
+
+| Home | Activity Tracker | Steps Tracker |
+|------|------------------|---------------|
+| ![Home](Screenshots/Home.png) | ![Activity Tracker](Screenshots/ActivityTracker.png) | ![Steps Tracker](Screenshots/StepsTracker.png) |
+
+| Calorie Tracker | Community |
+|-----------------|-----------|
+| ![Calorie Tracker](Screenshots/CalorieTracker.png) | ![Community](Screenshots/Community.png) |
 
 ---
 

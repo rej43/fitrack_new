@@ -96,5 +96,5 @@ See `backend/SETUP.md` for full backend configuration.
 
 - **Pratik Mishra**
 - **Rejisha Bharati**
-- **Susmit Karki** — [GitHub @rej43](https://github.com/rej43) · susmitkarki12@gmail.com
+- **Susmit Karki** 
 - **Swastik Shrestha**

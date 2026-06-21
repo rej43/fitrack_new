@@ -1,69 +1,97 @@
-# FiTrack App
+# FiTrack — Health & Fitness Tracking App
 
-FiTrack is a fitness companion application designed to help users stay fit by tracking their profile details, setting goals, and providing a smooth onboarding experience.
+![Flutter](https://img.shields.io/badge/Flutter-Dart-02569B?logo=flutter&logoColor=white)
+![Backend](https://img.shields.io/badge/Backend-Express%205%20%2B%20TypeScript-3178C6?logo=typescript&logoColor=white)
+![Database](https://img.shields.io/badge/Database-MongoDB-47A248?logo=mongodb&logoColor=white)
+![Auth](https://img.shields.io/badge/Auth-JWT%20%2B%20Google%20OAuth-orange)
+
+FiTrack is a cross-platform fitness app built with Flutter. It helps users track daily
+activity — steps, calories, sleep, and water — set personal goals, and view their progress
+through charts. It is backed by a TypeScript/Express REST API with MongoDB.
+
+---
 
 ## Features
 
-* **Splash Screen with Animated Logo**: A welcoming splash screen featuring the FiTrack logo that performs a quick 360-degree rotation animation upon app launch.
-* **Onboarding Screens**: Guides new users through initial setup.
-* **Complete Profile Section**:
-    * Allows users to input personal details such as Gender, Date of Birth, Weight, and Height.
-    * Interactive pickers for weight and height selection.
-    * Validation for required fields.
-    * Custom styling for input fields (e.g., icons, rounded containers).
-    * Improved readability with bold text for section titles.
-    * Cleaned numeric displays for weight and height (removed "kg" and "cm" units from the displayed number itself, while retaining the unit labels on the side).
-* **Navigation**: Seamless transition to the Goal Setting screen after profile completion.
-* **Gradient Backgrounds**: Visually appealing linear gradients for certain sections.
+- **Onboarding & profile setup** — gender, date of birth, weight, height with interactive pickers and validation
+- **Activity tracking** — steps (via device pedometer), calories, sleep, and water intake
+- **Goal setting** — set targets and track progress against them
+- **Dashboard** — daily activity overview with progress visualisation
+- **Charts & reports** — built with `fl_chart` and Syncfusion charts
+- **Authentication** — email/password (JWT) and Google sign-in
+- **Admin dashboard** and a basic community view
 
-## Screenshots
+---
 
-| Splash/Started View  | Complete Profile View |
-| :------------------- | :-------------------- |
-| ![Splash Screen](Screenshots/StartedView.png) | ![Complete Profile](Screenshots/CompleteProfile.png) |
+## Tech Stack
 
-*(Note: The `FiTrackLogo.png` file is the animated logo)*
+**Mobile (Flutter / Dart)**
+- `pedometer` — real step counting
+- `fl_chart`, `syncfusion_flutter_charts` — graphs
+- `shared_preferences` — local storage
+- `permission_handler`, `image_picker`, `http`
+
+**Backend (Node + TypeScript)**
+- Express 5
+- MongoDB with Mongoose + Typegoose
+- JWT auth + `bcryptjs` password hashing
+- Google OAuth via Passport (`passport-google-oauth20`)
+- Zod for request validation, `express-rate-limit`, `morgan` logging
+
+---
+
+## Project Structure
+
+```
+fitrack_new/
+├── lib/                 # Flutter app
+│   ├── view/            # screens (login, home, activity, profile, community, admin)
+│   ├── common_widget/   # reusable widgets
+│   ├── services/        # api_service, data_sync_service
+│   └── models/
+├── backend/             # Express + TypeScript API
+│   └── src/
+│       ├── controllers/ routes/ services/ models/
+│       ├── middlewares/  config/  zod/  utils/
+│       └── index.ts
+├── assets/
+└── Screenshots/
+```
+
+---
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
-
-### Prerequisites
-
-Before you begin, ensure you have the following installed on your system:
-
-* [Flutter SDK](https://flutter.dev/docs/get-started/install)
-* [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [Xcode](https://developer.apple.com/xcode/) Or [Visual Studio Code](https://code.visualstudio.com/Download)
-
-### Installation
-
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/rej43/fitrack_new.git
-    cd FiTrack
-    ```
-
-2.  **Install dependencies:**
-    Navigate to the project root and run:
-    ```bash
-    flutter pub get
-    ```
-
-3.  **Ensure assets are configured:**
-    Verify your `pubspec.yaml` file includes the `assets` folder:
-    ```yaml
-    flutter:
-      uses-material-design: true
-      assets:
-        - assets/
-        - assets/img/ # If you have images in assets/img/
-    ```
-    After modifying `pubspec.yaml`, always run `flutter pub get` again.
-
-### Running the App
-
-To run the app on a connected device or emulator:
+### 1. Mobile app
 
 ```bash
+git clone https://github.com/rej43/fitrack_new.git
+cd fitrack_new
+flutter pub get
 flutter run
+```
+
+### 2. Backend API
+
+```bash
+cd backend
+npm install        # or: bun install
+cp .env.sample .env   # then fill in MONGODB_URI, JWT secret, Google OAuth keys
+npm run dev
+```
+
+See `backend/SETUP.md` for full backend configuration.
+
+---
+
+## Screenshots
+
+| Splash | Complete Profile |
+|--------|------------------|
+| ![Splash](Screenshots/StartedView.png) | ![Profile](Screenshots/CompleteProfile.png) |
+
+---
+
+## Author
+
+**Susmit Karki** — [GitHub @rej43](https://github.com/rej43) · susmitkarki12@gmail.com

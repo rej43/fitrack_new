@@ -92,9 +92,9 @@ See `backend/SETUP.md` for full backend configuration.
 
 ---
 
-## Author
+## Authors
 
-**Pratik Mishra**
-**Rejisha Bharati**
-**Susmit Karki** 
-**Swastik Shrestha**
+- **Pratik Mishra**
+- **Rejisha Bharati**
+- **Susmit Karki** — [GitHub @rej43](https://github.com/rej43) · susmitkarki12@gmail.com
+- **Swastik Shrestha**

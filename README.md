@@ -94,4 +94,7 @@ See `backend/SETUP.md` for full backend configuration.
 
 ## Author
 
-**Susmit Karki** — [GitHub @rej43](https://github.com/rej43) · susmitkarki12@gmail.com
+**Pratik Mishra**
+**Rejisha Bharati**
+**Susmit Karki** 
+**Swastik Shrestha**
